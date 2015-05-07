@@ -1,0 +1,11 @@
+#!/bin/bash
+
+git add Builds
+
+git add Source
+
+git add JuceLibraryCode
+
+git commit -m "new"
+
+git push --force origin master
