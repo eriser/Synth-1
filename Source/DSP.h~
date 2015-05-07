@@ -1,0 +1,24 @@
+/*
+  ==============================================================================
+
+    DSP.h
+    Created: 7 May 2015 8:29:56am
+    Author:  mobilestudio
+
+  ==============================================================================
+*/
+
+#ifndef DSP_H_INCLUDED
+#define DSP_H_INCLUDED
+
+class DSP
+{
+ public:
+  DSP ();
+  ~DSP ();
+private:
+    //==============================================================================
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DSP)
+};
+
+#endif  // DSP_H_INCLUDED
