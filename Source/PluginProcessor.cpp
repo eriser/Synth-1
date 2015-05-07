@@ -9,6 +9,61 @@
 
 //==============================================================================
 //
+//   Envelope Class
+//
+//==============================================================================
+
+Envelope::Envelope ()
+{
+}
+
+Envelope::~Envelope ()
+{
+}
+
+void Envelope::init (double sampleRate, int blockSize)
+{
+  _sampleRate = sampleRate;
+  _blockSize = blockSize;
+}
+
+//==============================================================================
+//
+//   Filter Class
+//
+//==============================================================================
+
+Filter::Filter ()
+{
+}
+
+Filter::~Filter ()
+{
+}
+
+void Filter::init (double sampleRate, int blockSize)
+{
+  _sampleRate = sampleRate;
+  _blockSize = blockSize;
+}
+
+float Filter::lowpass (void)
+{
+  return 0;
+}
+
+float Filter::highpass (void)
+{
+  return 0;
+}
+
+float Filter::bandpass (void)
+{
+  return 0;
+}
+
+//==============================================================================
+//
 //   Oscillator Class
 //
 //==============================================================================
@@ -88,6 +143,11 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
   OSC2 = NULL;
   OSC3 = NULL;
   OSC4 = NULL;
+
+  FILTER1 = NULL;
+  FILTER2 = NULL;
+  FILTER3 = NULL;
+  FILTER4 = NULL;
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
@@ -107,6 +167,11 @@ NewProjectAudioProcessor::~NewProjectAudioProcessor()
   delete OSC2;
   delete OSC3;
   delete OSC4;
+
+  delete FILTER1;
+  delete FILTER2;
+  delete FILTER3;
+  delete FILTER4;
 }
 
 //==============================================================================
@@ -285,6 +350,18 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 
   OSC4 = new Oscillator;
   OSC4->init (sampleRate, samplesPerBlock);
+
+  FILTER1 = new Filter;
+  FILTER1->init (sampleRate, samplesPerBlock);
+
+  FILTER2 = new Filter;
+  FILTER2->init (sampleRate, samplesPerBlock);
+
+  FILTER3 = new Filter;
+  FILTER3->init (sampleRate, samplesPerBlock);
+
+  FILTER4 = new Filter;
+  FILTER4->init (sampleRate, samplesPerBlock);
 }
 
 void NewProjectAudioProcessor::releaseResources()
@@ -304,6 +381,11 @@ void NewProjectAudioProcessor::releaseResources()
   OSC2 = NULL;
   OSC3 = NULL;
   OSC3 = NULL;
+
+  FILTER1 = NULL;
+  FILTER2 = NULL;
+  FILTER3 = NULL;
+  FILTER4 = NULL;
 }
 
 void NewProjectAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)

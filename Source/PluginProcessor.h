@@ -11,6 +11,45 @@
 
 //==============================================================================
 //
+//   Envelope Class
+//
+//==============================================================================
+
+class Envelope
+{
+public:
+  Envelope ()
+  ~Envelope ()
+
+    void init (double sampleRate, int blockSize);
+private:
+  double _sampleRate;
+  int _blockSize;
+};
+
+//==============================================================================
+//
+//   Filter Class
+//
+//==============================================================================
+
+class Filter
+{
+public:
+  Filter ();
+  ~Filter ();
+
+  void init (double sampleRate, int blockSize);
+  float lowpass (void);
+  float highpass (void);
+  float bandpass (void);
+private:
+  double _sampleRate;
+  int _blockSize;
+};
+
+//==============================================================================
+//
 //   Oscillator Class
 //
 //==============================================================================
@@ -103,6 +142,11 @@ public:
     Oscillator *OSC2;
     Oscillator *OSC3;
     Oscillator *OSC4;
+
+    Filter *FILTER1;
+    Filter *FILTER2;
+    Filter *FILTER3;
+    Filter *FILTER4;
     
     //==============================================================================
     float **_juceIn;
