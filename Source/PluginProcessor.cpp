@@ -11,23 +11,106 @@
 #include "PluginProcessor.h"
 #include "GUI.h"
 
+//==============================================================================
+//
+//   Oscillator Class
+//
+//==============================================================================
 
+Oscillator::Oscillator ()
+{
+}
+
+Oscillator::~Oscillator ()
+{
+}
+
+void Oscillator::init (double sampleRate, int blockSize)
+{
+  _sampleRate = sampleRate;
+  _blockSize = blockSize;
+  _phase = 0;
+}
+
+void Oscillator::setFreq (float freq)
+{
+  _recalcInc = true;
+  _freq = freq;
+}
+
+float Oscillator::getFreq (void)
+{
+  return _freq;
+}
+
+void Oscillator::calcInc (void)
+{
+  // _sampleRate / _freq = numSteps
+  // 1 / numSteps = _increment
+  float temp = (float)_sampleRate / _freq;
+  _increment = 1 / temp;
+
+  _recalcInc = false;
+}
+
+void Oscillator::calcPhase (void)
+{
+  if (_phase >= 1) _phase = 0;
+  _phase = _phase + _increment;
+}
+
+void Oscillator::setPhase (float phase)
+{
+  _phase = phase;
+}
+
+float Oscillator::getPhase (void)
+{
+  return _phase;
+}
+
+float Oscillator::getNewPhase (void)
+{
+  if (_recalcInc) calcInc ();
+    
+  calcPhase ();
+  return _phase;
+}
 
 //==============================================================================
+//
+//   NewProjectAudioProcessor Class
+//
+//==============================================================================
+
 NewProjectAudioProcessor::NewProjectAudioProcessor()
 {
   _juceIn = NULL;
   _juceOut = NULL;
   
-  //audioDSP = new DSP;
+  OSC1 = NULL;
+  OSC2 = NULL;
+  OSC3 = NULL;
+  OSC4 = NULL;
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
 {
-  //delete audioDSP;
-  
-  delete _juceIn;
-  delete _juceOut;
+  if (_juceIn)
+    {
+      for (int i = 0; i < getNumInputChannels(); ++i)
+	delete _juceIn[i];
+      delete _juceIn;
+
+      for (int i = 0; i < getNumOutputChannels(); ++i)
+	delete _juceOut[i];
+      delete _juceOut;
+    }
+
+  delete OSC1;
+  delete OSC2;
+  delete OSC3;
+  delete OSC4;
 }
 
 //==============================================================================
@@ -38,7 +121,7 @@ const String NewProjectAudioProcessor::getName() const
 
 int NewProjectAudioProcessor::getNumParameters()
 {
-    return 0;
+    return 9;
 }
 
 float NewProjectAudioProcessor::getParameter (int index)
@@ -48,15 +131,65 @@ float NewProjectAudioProcessor::getParameter (int index)
 
 void NewProjectAudioProcessor::setParameter (int index, float newValue)
 {
+  if (index == 0)
+    {
+      _masterVolume = newValue;
+    }
+
+  if (index == 1)
+    {
+      float temp = newValue * 127;
+      OSC1->setFreq (temp);
+    }
+
+  if (index == 2)
+    {
+      float temp = newValue * 127;
+      OSC2->setFreq (temp);
+    }
+
+  if (index == 3)
+    {
+      float temp = newValue * 127;
+      OSC3->setFreq (temp);
+    }
+
+  if (index == 4)
+    {
+      float temp = newValue * 127;
+      OSC4->setFreq (temp);
+    }
 }
 
 const String NewProjectAudioProcessor::getParameterName (int index)
 {
+  if(index == 0) return "Master Volume";
+
+  if(index == 1) return "OSC1 Pitch";
+  if(index == 2) return "OSC2 Pitch";
+  if(index == 3) return "OSC3 Pitch";
+  if(index == 4) return "OSC4 Pitch";
+
+  if(index == 5) return "N.C.";
+  if(index == 6) return "N.C.";
+  if(index == 7) return "N.C.";
+  if(index == 8) return "N.C.";
     return String();
 }
 
 const String NewProjectAudioProcessor::getParameterText (int index)
 {
+  if(index == 0) return "Master Volume";
+
+  if(index == 1) return "OSC1 Pitch";
+  if(index == 2) return "OSC2 Pitch";
+  if(index == 3) return "OSC3 Pitch";
+  if(index == 4) return "OSC4 Pitch";
+
+  if(index == 5) return "N.C.";
+  if(index == 6) return "N.C.";
+  if(index == 7) return "N.C.";
+  if(index == 8) return "N.C.";
     return String();
 }
 
@@ -135,13 +268,8 @@ void NewProjectAudioProcessor::changeProgramName (int index, const String& newNa
 //==============================================================================
 void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
   _blockSize = samplesPerBlock;
-  _sampleRate = sampleRate;
-
-  //audioDSP->init (_sampleRate, _blockSize, getNumInputChannels(),getNumOutputChannels());
-
+  
   _juceIn = new float*[getNumInputChannels()];
   for (int i = 0; i < getNumInputChannels(); ++i)
     _juceIn[i] = new float[samplesPerBlock];
@@ -149,40 +277,85 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
   _juceOut = new float*[getNumOutputChannels()];
   for (int i = 0; i < getNumOutputChannels(); ++i)
     _juceOut[i] = new float[samplesPerBlock];
-  
+
+  OSC1 = new Oscillator;
+  OSC1->init (sampleRate, samplesPerBlock);
+
+  OSC2 = new Oscillator;
+  OSC2->init (sampleRate, samplesPerBlock);
+
+  OSC3 = new Oscillator;
+  OSC3->init (sampleRate, samplesPerBlock);
+
+  OSC4 = new Oscillator;
+  OSC4->init (sampleRate, samplesPerBlock);
 }
 
 void NewProjectAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
-  
+  if (_juceIn)
+    {
+      for (int i = 0; i < getNumInputChannels(); ++i)
+	delete _juceIn[i];
+      delete _juceIn;
+
+      for (int i = 0; i < getNumOutputChannels(); ++i)
+	delete _juceOut[i];
+      delete _juceOut;
+    }
+
+  OSC1 = NULL;
+  OSC2 = NULL;
+  OSC3 = NULL;
+  OSC3 = NULL;
 }
 
 void NewProjectAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
+  //for (int i = 0; i < _blockSize; i++)
+  //  {
+  //    if (lastValue > 1) lastValue = 0;
+      
+  //    lastValue = lastValue + (increment);
+      
+  //    _juceOut[0][i] = lastValue;
+  //    _juceOut[1][i] = lastValue;
+  //  }
+  
+  //    buffer.copyFrom (0, 0, _juceOut[0], _blockSize);
+  //    buffer.copyFrom (1, 0, _juceOut[1], _blockSize);
+
+  float currentValueOSC1;
+  float currentValueOSC2;
+  float currentValueOSC3;
+  float currentValueOSC4;
+
+  float outputValue;
+  
   for (int i = 0; i < _blockSize; i++)
     {
-      float randomValue = (float)i /(float) _blockSize;
-      
+      currentValueOSC1 = OSC1->getNewPhase ();
+      currentValueOSC2 = OSC2->getNewPhase ();
+      currentValueOSC3 = OSC3->getNewPhase ();
+      currentValueOSC4 = OSC4->getNewPhase ();
 
-      _juceOut[0][i] = randomValue;
-      _juceOut[1][i] = randomValue;
+      _juceOut[0][i] = currentValueOSC1 * _masterVolume;
+      _juceOut[1][i] = currentValueOSC1 * _masterVolume;
     }
-  
-      buffer.copyFrom (0, 0, _juceOut[0], _blockSize);
-      buffer.copyFrom (1, 0, _juceOut[1], _blockSize);
+
+  buffer.copyFrom (0, 0, _juceOut[0], _blockSize);
+  buffer.copyFrom (1, 0, _juceOut[1], _blockSize);
 }
 
 //==============================================================================
 bool NewProjectAudioProcessor::hasEditor() const
 {
-    return true; // (change this to false if you choose to not supply an editor)
+  //return true; // (change this to false if you choose to not supply an editor)
+    return false; // (change this to false if you choose to not supply an editor)
 }
 
 AudioProcessorEditor* NewProjectAudioProcessor::createEditor()
 {
-    //return new NewProjectAudioProcessorEditor (*this);
     return new GUI (*this);
 }
 

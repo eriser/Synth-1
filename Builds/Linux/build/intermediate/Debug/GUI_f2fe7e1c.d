@@ -467,4 +467,4 @@ build/intermediate/Debug/GUI_f2fe7e1c.o: ../../Source/GUI.cpp \
  ../../JuceLibraryCode/modules/juce_video/../../../../../../../juce/modules/juce_video/playback/juce_QuickTimeMovieComponent.h \
  ../../JuceLibraryCode/modules/juce_video/../../../../../../../juce/modules/juce_video/capture/juce_CameraDevice.h \
  ../../Source/PluginProcessor.h \
- ../../Source/../JuceLibraryCode/JuceHeader.h ../../Source/DSP.h
+ ../../Source/../JuceLibraryCode/JuceHeader.h
