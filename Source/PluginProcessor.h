@@ -11,6 +11,28 @@
 
 //==============================================================================
 //
+//   Delay Class
+//
+//==============================================================================
+
+class Delay
+{
+public:
+  Delay ();
+  Delay (double sampleRate, int blockSize);
+  ~Delay ();
+  
+private:
+  double _sampleRate;
+  int _blockSize;
+  int _maxLength;
+
+  float **delayLine01;
+  float **delayLine02;
+};
+
+//==============================================================================
+//
 //   Envelope Class
 //
 //==============================================================================
@@ -18,10 +40,10 @@
 class Envelope
 {
 public:
-  Envelope ()
-  ~Envelope ()
+  Envelope ();
+  Envelope (double sampleRate, int blockSize);
+  ~Envelope ();
 
-    void init (double sampleRate, int blockSize);
 private:
   double _sampleRate;
   int _blockSize;
@@ -147,6 +169,16 @@ public:
     Filter *FILTER2;
     Filter *FILTER3;
     Filter *FILTER4;
+
+    Envelope *ENV1;
+    Envelope *ENV2;
+    Envelope *ENV3;
+    Envelope *ENV4;
+
+    Delay *DLL1;
+    Delay *DLL2;
+    Delay *DLL3;
+    Delay *DLL4;
     
     //==============================================================================
     float **_juceIn;

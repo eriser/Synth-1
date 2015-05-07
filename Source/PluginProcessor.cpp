@@ -9,6 +9,31 @@
 
 //==============================================================================
 //
+//   Delay Class
+//
+//==============================================================================
+
+Delay::Delay ()
+{
+}
+
+Delay::Delay (double sampleRate, int blockSize)
+{
+  _sampleRate = sampleRate;
+  _blockSize = blockSize;
+
+  delayLine01 = NULL;
+  delayLine02 = NULL;
+}
+
+Delay::~Delay ()
+{
+  delete delayLine01;
+  delete delayLine02;
+}
+
+//==============================================================================
+//
 //   Envelope Class
 //
 //==============================================================================
@@ -17,14 +42,14 @@ Envelope::Envelope ()
 {
 }
 
-Envelope::~Envelope ()
-{
-}
-
-void Envelope::init (double sampleRate, int blockSize)
+Envelope::Envelope (double sampleRate, int blockSize)
 {
   _sampleRate = sampleRate;
   _blockSize = blockSize;
+}
+
+Envelope::~Envelope ()
+{
 }
 
 //==============================================================================
@@ -46,6 +71,69 @@ void Filter::init (double sampleRate, int blockSize)
   _sampleRate = sampleRate;
   _blockSize = blockSize;
 }
+
+//=======================================================
+//
+//  Example Code from moog~.c Pd
+//
+//  static t_float calc_k(t_float f,t_float k) {
+//  if (k>4.) k =4.;
+//  if (k < 0.) k = 0.;
+//  if (f <= 3800) return k;
+//  k = k - 0.5*((f-3800)/4300);
+//  return k;
+//
+//  t_int *moog_perform(t_int *w)
+//  {
+//    t_moog* x = (t_moog*) (w[1]); 
+//    t_float *in1 = (t_float *)(w[2]);
+//    t_float *p = (t_float *)(w[3]);
+//    t_float *k = (t_float *)(w[4]);
+//
+//    t_float *out = (t_float *)(w[5]);
+//    int n = (int)(w[6]);
+//    float in;
+//    float pt,pt1;
+//    
+//    float x1 = x->x_1;
+//    float x2 = x->x_2;
+//    float x3 = x->x_3;
+//    float x4 = x->x_4;
+//    float ys1 = x->y_1;
+//    float ys2 = x->y_2;
+//    float ys3 = x->y_3;
+//    float ys4 = x->y_4;
+//
+//
+//   while (n--) {
+//     if (*p > 8140) *p = 8140.;
+//     *k = calc_k(*p,*k);
+//     pt =*p;
+//     pt1=(pt+1)*0.76923077;
+//     in = *in1++ - *k*ys4;
+//     ys1 = (pt1)*in + 0.3*x1 - pt*ys1;
+//     x1 = in;
+//     ys2 = (pt1)*ys1 + 0.3*x2 - pt*ys2;
+//     x2 = ys1;
+//     ys3 = (pt1)*ys2 + 0.3 *x3 - pt*ys3;
+//     x3 = ys2;
+//     ys4 = (pt1)*ys3 + 0.3*x4 - pt*ys4;
+//     x4 = ys3;
+//     *out++ = ys4;
+//   }
+//
+//   
+//    x->y_1 = ys1;
+//    x->y_2 = ys2;
+//    x->y_3 = ys3;
+//    x->y_4 = ys4;
+//    x->x_1 = x1;
+//    x->x_2 = x2;
+//    x->x_3 = x3;
+//    x->x_4 = x4;
+//
+//    return (w+7);
+//}
 
 float Filter::lowpass (void)
 {
@@ -148,6 +236,16 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
   FILTER2 = NULL;
   FILTER3 = NULL;
   FILTER4 = NULL;
+
+  ENV1 = NULL;
+  ENV2 = NULL;
+  ENV3 = NULL;
+  ENV4 = NULL;
+
+  DLL1 = NULL;
+  DLL2 = NULL;
+  DLL3 = NULL;
+  DLL4 = NULL;
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
@@ -172,6 +270,16 @@ NewProjectAudioProcessor::~NewProjectAudioProcessor()
   delete FILTER2;
   delete FILTER3;
   delete FILTER4;
+
+  delete ENV1;
+  delete ENV2;
+  delete ENV3;
+  delete ENV4;
+
+  delete DLL1;
+  delete DLL2;
+  delete DLL3;
+  delete DLL4;
 }
 
 //==============================================================================
@@ -362,6 +470,16 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 
   FILTER4 = new Filter;
   FILTER4->init (sampleRate, samplesPerBlock);
+
+  ENV1 = new Envelope (sampleRate,samplesPerBlock);
+  ENV2 = new Envelope (sampleRate,samplesPerBlock);
+  ENV3 = new Envelope (sampleRate,samplesPerBlock);
+  ENV4 = new Envelope (sampleRate,samplesPerBlock);
+
+  DLL1 = new Delay (sampleRate,samplesPerBlock);
+  DLL2 = new Delay (sampleRate,samplesPerBlock);
+  DLL3 = new Delay (sampleRate,samplesPerBlock);
+  DLL4 = new Delay (sampleRate,samplesPerBlock);
 }
 
 void NewProjectAudioProcessor::releaseResources()
@@ -386,6 +504,16 @@ void NewProjectAudioProcessor::releaseResources()
   FILTER2 = NULL;
   FILTER3 = NULL;
   FILTER4 = NULL;
+
+  ENV1 = NULL;
+  ENV2 = NULL;
+  ENV3 = NULL;
+  ENV4 = NULL;
+
+  DLL1 = NULL;
+  DLL2 = NULL;
+  DLL3 = NULL;
+  DLL4 = NULL;
 }
 
 void NewProjectAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
