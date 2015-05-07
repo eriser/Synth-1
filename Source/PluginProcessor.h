@@ -9,94 +9,31 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-//==============================================================================
-//
-//   Delay Class
-//
-//==============================================================================
+#include "Delay.h"
+#include "Noise.h"
+#include "Envelope.h"
+#include "Filter.h"
+#include "Oscillator.h"
 
-class Delay
+//=============================================================================
+//
+//   MidiEvent Class
+//
+//=============================================================================
+
+class MidiEvent
 {
 public:
-  Delay ();
-  Delay (double sampleRate, int blockSize);
-  ~Delay ();
+
+  MidiEvent ();
+  ~MidiEvent ();
   
 private:
-  double _sampleRate;
+
+  float _masterVolume = 1;
   int _blockSize;
-  int _maxLength;
+  int _sampleRate;
 
-  float **delayLine01;
-  float **delayLine02;
-};
-
-//==============================================================================
-//
-//   Envelope Class
-//
-//==============================================================================
-
-class Envelope
-{
-public:
-  Envelope ();
-  Envelope (double sampleRate, int blockSize);
-  ~Envelope ();
-
-private:
-  double _sampleRate;
-  int _blockSize;
-};
-
-//==============================================================================
-//
-//   Filter Class
-//
-//==============================================================================
-
-class Filter
-{
-public:
-  Filter ();
-  ~Filter ();
-
-  void init (double sampleRate, int blockSize);
-  float lowpass (void);
-  float highpass (void);
-  float bandpass (void);
-private:
-  double _sampleRate;
-  int _blockSize;
-};
-
-//==============================================================================
-//
-//   Oscillator Class
-//
-//==============================================================================
-
-class Oscillator
-{
- public:
-  Oscillator ();
-  ~Oscillator ();
-
-  void init (double sampleRate, int blockSize);
-  void setFreq (float freq);
-  float getFreq (void);
-  void calcInc (void);
-  void calcPhase (void);
-  void setPhase (float phase);
-  float getPhase (void);
-  float getNewPhase (void);
- private:
-  double _sampleRate;
-  int _blockSize;
-  float _phase;
-  float _freq;
-  float _increment;
-  bool _recalcInc = true;
 };
 
 //=============================================================================
@@ -111,55 +48,42 @@ public:
     //==============================================================================
     NewProjectAudioProcessor();
     ~NewProjectAudioProcessor();
-
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
-
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
-
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
-
     //==============================================================================
     const String getName() const override;
-
     int getNumParameters() override;
     float getParameter (int index) override;
     void setParameter (int index, float newValue) override;
-
     const String getParameterName (int index) override;
     const String getParameterText (int index) override;
-
     const String getInputChannelName (int channelIndex) const override;
     const String getOutputChannelName (int channelIndex) const override;
     bool isInputChannelStereoPair (int index) const override;
     bool isOutputChannelStereoPair (int index) const override;
-
     bool acceptsMidi() const override;
     bool producesMidi() const override;
     bool silenceInProducesSilenceOut() const override;
     double getTailLengthSeconds() const override;
-
     //==============================================================================
     int getNumPrograms() override;
     int getCurrentProgram() override;
     void setCurrentProgram (int index) override;
     const String getProgramName (int index) override;
     void changeProgramName (int index, const String& newName) override;
-
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-//    //============================================================================
-    //
-    //  NewProjectAudioProcessor -> My Public Stuff
-    //
-//    //============================================================================
 
     //==============================================================================
+    //   DSP Function Pointer
+    
     Oscillator *OSC1;
     Oscillator *OSC2;
     Oscillator *OSC3;
@@ -179,16 +103,35 @@ public:
     Delay *DLL2;
     Delay *DLL3;
     Delay *DLL4;
+
+    Noise *NOISE1;
     
     //==============================================================================
+    //   Audio Buffer
+    
     float **_juceIn;
     float **_juceOut;
 
-    float _masterVolume = 1;
+    AudioSampleBuffer *_mixer1;
+    AudioSampleBuffer *_mixer2;
+    AudioSampleBuffer *_mixer3;
+    AudioSampleBuffer *_mixer4;
 
+    AudioSampleBuffer *bufferRevolver[16];
+    
+    //==============================================================================
+    // 
+    float _masterVolume = 1;
     int _blockSize;
 
+    int timeOfFirstEvent;
+    int timeOfLastEvent;
+    int numEvents; 
+
     //==============================================================================
+    //   Lookup Tables
+
+    // Midi-Note To Frequency
     float mtof[128] = { 8.1757989156,  8.6619572180,  9.1770239974,  9.7227182413
 		      ,10.3008611535, 10.9133822323, 11.5623257097, 12.2498573744
 		      ,12.9782717994, 13.7500000000, 14.5676175474, 15.4338531643

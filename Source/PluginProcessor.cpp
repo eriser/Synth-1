@@ -9,215 +9,6 @@
 
 //==============================================================================
 //
-//   Delay Class
-//
-//==============================================================================
-
-Delay::Delay ()
-{
-}
-
-Delay::Delay (double sampleRate, int blockSize)
-{
-  _sampleRate = sampleRate;
-  _blockSize = blockSize;
-
-  delayLine01 = NULL;
-  delayLine02 = NULL;
-}
-
-Delay::~Delay ()
-{
-  delete delayLine01;
-  delete delayLine02;
-}
-
-//==============================================================================
-//
-//   Envelope Class
-//
-//==============================================================================
-
-Envelope::Envelope ()
-{
-}
-
-Envelope::Envelope (double sampleRate, int blockSize)
-{
-  _sampleRate = sampleRate;
-  _blockSize = blockSize;
-}
-
-Envelope::~Envelope ()
-{
-}
-
-//==============================================================================
-//
-//   Filter Class
-//
-//==============================================================================
-
-Filter::Filter ()
-{
-}
-
-Filter::~Filter ()
-{
-}
-
-void Filter::init (double sampleRate, int blockSize)
-{
-  _sampleRate = sampleRate;
-  _blockSize = blockSize;
-}
-
-//=======================================================
-//
-//  Example Code from moog~.c Pd
-//
-//  static t_float calc_k(t_float f,t_float k) {
-//  if (k>4.) k =4.;
-//  if (k < 0.) k = 0.;
-//  if (f <= 3800) return k;
-//  k = k - 0.5*((f-3800)/4300);
-//  return k;
-//
-//  t_int *moog_perform(t_int *w)
-//  {
-//    t_moog* x = (t_moog*) (w[1]); 
-//    t_float *in1 = (t_float *)(w[2]);
-//    t_float *p = (t_float *)(w[3]);
-//    t_float *k = (t_float *)(w[4]);
-//
-//    t_float *out = (t_float *)(w[5]);
-//    int n = (int)(w[6]);
-//    float in;
-//    float pt,pt1;
-//    
-//    float x1 = x->x_1;
-//    float x2 = x->x_2;
-//    float x3 = x->x_3;
-//    float x4 = x->x_4;
-//    float ys1 = x->y_1;
-//    float ys2 = x->y_2;
-//    float ys3 = x->y_3;
-//    float ys4 = x->y_4;
-//
-//
-//   while (n--) {
-//     if (*p > 8140) *p = 8140.;
-//     *k = calc_k(*p,*k);
-//     pt =*p;
-//     pt1=(pt+1)*0.76923077;
-//     in = *in1++ - *k*ys4;
-//     ys1 = (pt1)*in + 0.3*x1 - pt*ys1;
-//     x1 = in;
-//     ys2 = (pt1)*ys1 + 0.3*x2 - pt*ys2;
-//     x2 = ys1;
-//     ys3 = (pt1)*ys2 + 0.3 *x3 - pt*ys3;
-//     x3 = ys2;
-//     ys4 = (pt1)*ys3 + 0.3*x4 - pt*ys4;
-//     x4 = ys3;
-//     *out++ = ys4;
-//   }
-//
-//   
-//    x->y_1 = ys1;
-//    x->y_2 = ys2;
-//    x->y_3 = ys3;
-//    x->y_4 = ys4;
-//    x->x_1 = x1;
-//    x->x_2 = x2;
-//    x->x_3 = x3;
-//    x->x_4 = x4;
-//
-//    return (w+7);
-//}
-
-float Filter::lowpass (void)
-{
-  return 0;
-}
-
-float Filter::highpass (void)
-{
-  return 0;
-}
-
-float Filter::bandpass (void)
-{
-  return 0;
-}
-
-//==============================================================================
-//
-//   Oscillator Class
-//
-//==============================================================================
-
-Oscillator::Oscillator ()
-{
-}
-
-Oscillator::~Oscillator ()
-{
-}
-
-void Oscillator::init (double sampleRate, int blockSize)
-{
-  _sampleRate = sampleRate;
-  _blockSize = blockSize;
-  _phase = 0;
-}
-
-void Oscillator::setFreq (float freq)
-{
-  _recalcInc = true;
-  _freq = freq;
-}
-
-float Oscillator::getFreq (void)
-{
-  return _freq;
-}
-
-void Oscillator::calcInc (void)
-{
-  // _sampleRate / _freq = numSteps
-  // 1 / numSteps = _increment
-  float temp = (float)_sampleRate / _freq;
-  _increment = 1 / temp;
-
-  _recalcInc = false;
-}
-
-void Oscillator::calcPhase (void)
-{
-  if (_phase >= 1) _phase = 0;
-  _phase = _phase + _increment;
-}
-
-void Oscillator::setPhase (float phase)
-{
-  _phase = phase;
-}
-
-float Oscillator::getPhase (void)
-{
-  return _phase;
-}
-
-float Oscillator::getNewPhase (void)
-{
-  if (_recalcInc) calcInc ();
-    
-  calcPhase ();
-  return _phase;
-}
-
-//==============================================================================
-//
 //   NewProjectAudioProcessor Class
 //
 //==============================================================================
@@ -226,6 +17,11 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
 {
   _juceIn = NULL;
   _juceOut = NULL;
+
+  _mixer1 = NULL;
+  _mixer2 = NULL;
+  _mixer3 = NULL;
+  _mixer4 = NULL;
   
   OSC1 = NULL;
   OSC2 = NULL;
@@ -246,6 +42,8 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
   DLL2 = NULL;
   DLL3 = NULL;
   DLL4 = NULL;
+
+  NOISE1 = NULL;
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
@@ -266,6 +64,8 @@ NewProjectAudioProcessor::~NewProjectAudioProcessor()
   delete OSC3;
   delete OSC4;
 
+  delete NOISE1;
+
   delete FILTER1;
   delete FILTER2;
   delete FILTER3;
@@ -280,6 +80,13 @@ NewProjectAudioProcessor::~NewProjectAudioProcessor()
   delete DLL2;
   delete DLL3;
   delete DLL4;
+
+  delete _mixer1;
+  delete _mixer2;
+  delete _mixer3;
+  delete _mixer4;
+
+  delete bufferRevolver;
 }
 
 //==============================================================================
@@ -290,7 +97,7 @@ const String NewProjectAudioProcessor::getName() const
 
 int NewProjectAudioProcessor::getNumParameters()
 {
-    return 9;
+    return 33;
 }
 
 float NewProjectAudioProcessor::getParameter (int index)
@@ -300,66 +107,193 @@ float NewProjectAudioProcessor::getParameter (int index)
 
 void NewProjectAudioProcessor::setParameter (int index, float newValue)
 {
-  if (index == 0)
-    {
-      _masterVolume = newValue;
-    }
+  //=MASTER=====================================
+  //
+  // Master Volume
+  if (index == 0) _masterVolume = newValue;
 
-  if (index == 1)
-    {
-      float temp = newValue * 127;
-      OSC1->setFreq (temp);
-    }
+  //=OSC1=======================================
+  //
+  // OSC1 Pitch Coarse
+  if (index == 1) OSC1->setFreq (newValue*127);
+  // OSC1 Pitch Fine
+  if (index == 2) ;
+  // OSC1 N.C.
+  if (index == 3) ;
+  // OSC1 N.C.
+  if (index == 4) ;
 
-  if (index == 2)
-    {
-      float temp = newValue * 127;
-      OSC2->setFreq (temp);
-    }
+  //=OSC2=======================================
+  //
+  // OSC2 Pitch Coarse
+  if (index == 5) OSC2->setFreq (newValue*127);
+  // OSC2 Pitch Fine
+  if (index == 6) ;
+  // OSC2 N.C.
+  if (index == 7) ;
+  // OSC2 N.C.
+  if (index == 8) ;
 
-  if (index == 3)
-    {
-      float temp = newValue * 127;
-      OSC3->setFreq (temp);
-    }
+  //=OSC3=======================================
+  //
+  // OSC3 Pitch Coarse
+  if (index == 9) OSC3->setFreq (newValue*127);
+  // OSC3 Pitch Fine
+  if (index == 10) ;
+  // OSC3 N.C.
+  if (index == 11) ;
+  // OSC3 N.C.
+  if (index == 12) ;
 
-  if (index == 4)
-    {
-      float temp = newValue * 127;
-      OSC4->setFreq (temp);
-    }
+  //=OSC4=======================================
+  //
+  // OSC4 Pitch Coarse
+  if (index == 13) OSC4->setFreq (newValue*127);
+  // OSC4 Pitch Fine
+  if (index == 14) ;
+  // OSC4 N.C.
+  if (index == 15) ;
+  // OSC4 N.C.
+  if (index == 16) ;
+
+  //=ENV1=======================================
+  //
+  // ENV1 Attack
+  if (index == 17) ENV1->setAttack (newValue*512);
+  // ENV1 Decay
+  if (index == 18) ENV1->setDecay (newValue*512);
+  // ENV1 Sustain
+  if (index == 19) ENV1->setSustain (newValue);
+  // ENV1 Release
+  if (index == 20) ENV1->setRelease (newValue*512);
+
+  //=ENV2=======================================
+  //
+  // ENV2 Attack
+  if (index == 21) ENV2->setAttack (newValue*512);
+  // ENV2 Decay
+  if (index == 22) ENV2->setDecay (newValue*512);
+  // ENV2 Sustain
+  if (index == 23) ENV2->setSustain (newValue);
+  // ENV2 Release
+  if (index == 24) ENV2->setRelease (newValue*512);  
+
+  //=ENV3=======================================
+  //
+  // ENV3 Attack
+  if (index == 25) ENV3->setAttack (newValue*512);
+  // ENV3 Decay
+  if (index == 26) ENV3->setDecay (newValue*512);
+  // ENV3 Sustain
+  if (index == 27) ENV3->setSustain (newValue);
+  // ENV3 Release
+  if (index == 28) ENV3->setRelease (newValue*512);
+
+  //=ENV4=======================================
+  //
+  // ENV4 Attack
+  if (index == 29) ENV4->setAttack (newValue*512);
+  // ENV4 Decay
+  if (index == 30) ENV4->setDecay (newValue*512);
+  // ENV4 Sustain
+  if (index == 31) ENV4->setSustain (newValue);
+  // ENV4 Release
+  if (index == 32) ENV4->setRelease (newValue*512);  
+  
 }
 
 const String NewProjectAudioProcessor::getParameterName (int index)
 {
   if(index == 0) return "Master Volume";
 
-  if(index == 1) return "OSC1 Pitch";
-  if(index == 2) return "OSC2 Pitch";
-  if(index == 3) return "OSC3 Pitch";
-  if(index == 4) return "OSC4 Pitch";
+  if(index == 1)  return "OSC1 Pitch Coarse";
+  if(index == 2)  return "OSC1 Pitch Fine";
+  if(index == 3)  return "OSC1 N.C.";
+  if(index == 4)  return "OSC1 N.C.";
 
-  if(index == 5) return "N.C.";
-  if(index == 6) return "N.C.";
-  if(index == 7) return "N.C.";
-  if(index == 8) return "N.C.";
-    return String();
+  if(index == 5)  return "OSC2 Pitch Coarse";
+  if(index == 6)  return "OSC2 Pitch Fine";
+  if(index == 7)  return "OSC2 N.C.";
+  if(index == 8)  return "OSC2 N.C.";
+
+  if(index == 9)  return "OSC3 Pitch Coarse";
+  if(index == 10) return "OSC3 Pitch Fine";
+  if(index == 11) return "OSC3 N.C.";
+  if(index == 12) return "OSC3 N.C.";
+
+  if(index == 13) return "OSC4 Pitch Coarse";
+  if(index == 14) return "OSC4 Pitch Fine";
+  if(index == 15) return "OSC4 N.C.";
+  if(index == 16) return "OSC4 N.C.";
+
+  if(index == 17) return "ENV1 Attack";
+  if(index == 18) return "ENV1 Decay";
+  if(index == 19) return "ENV1 Sustain";
+  if(index == 20) return "ENV1 Release";
+
+  if(index == 21) return "ENV2 Attack";
+  if(index == 22) return "ENV2 Decay";
+  if(index == 23) return "ENV2 Sustain";
+  if(index == 24) return "ENV2 Release";
+
+  if(index == 25) return "ENV3 Attack";
+  if(index == 26) return "ENV3 Decay";
+  if(index == 27) return "ENV3 Sustain";
+  if(index == 28) return "ENV3 Release";
+
+  if(index == 29) return "ENV4 Attack";
+  if(index == 30) return "ENV4 Decay";
+  if(index == 31) return "ENV4 Sustain";
+  if(index == 32) return "ENV4 Release";
+  
+  return String();
 }
 
 const String NewProjectAudioProcessor::getParameterText (int index)
 {
-  if(index == 0) return "Master Volume";
+  if(index == 0)  return "Master Volume";
 
-  if(index == 1) return "OSC1 Pitch";
-  if(index == 2) return "OSC2 Pitch";
-  if(index == 3) return "OSC3 Pitch";
-  if(index == 4) return "OSC4 Pitch";
+  if(index == 1)  return "OSC1 Pitch Coarse";
+  if(index == 2)  return "OSC1 Pitch Fine";
+  if(index == 3)  return "OSC1 N.C.";
+  if(index == 4)  return "OSC1 N.C.";
 
-  if(index == 5) return "N.C.";
-  if(index == 6) return "N.C.";
-  if(index == 7) return "N.C.";
-  if(index == 8) return "N.C.";
-    return String();
+  if(index == 5)  return "OSC2 Pitch Coarse";
+  if(index == 6)  return "OSC2 Pitch Fine";
+  if(index == 7)  return "OSC2 N.C.";
+  if(index == 8)  return "OSC2 N.C.";
+
+  if(index == 9)  return "OSC3 Pitch Coarse";
+  if(index == 10) return "OSC3 Pitch Fine";
+  if(index == 11) return "OSC3 N.C.";
+  if(index == 12) return "OSC3 N.C.";
+
+  if(index == 13) return "OSC4 Pitch Coarse";
+  if(index == 14) return "OSC4 Pitch Fine";
+  if(index == 15) return "OSC4 N.C.";
+  if(index == 16) return "OSC4 N.C.";
+
+  if(index == 17) return "ENV1 Attack";
+  if(index == 18) return "ENV1 Decay";
+  if(index == 19) return "ENV1 Sustain";
+  if(index == 20) return "ENV1 Release";
+
+  if(index == 21) return "ENV2 Attack";
+  if(index == 22) return "ENV2 Decay";
+  if(index == 23) return "ENV2 Sustain";
+  if(index == 24) return "ENV2 Release";
+
+  if(index == 25) return "ENV3 Attack";
+  if(index == 26) return "ENV3 Decay";
+  if(index == 27) return "ENV3 Sustain";
+  if(index == 28) return "ENV3 Release";
+
+  if(index == 29) return "ENV4 Attack";
+  if(index == 30) return "ENV4 Decay";
+  if(index == 31) return "ENV4 Sustain";
+  if(index == 32) return "ENV4 Release";
+  
+  return String();
 }
 
 const String NewProjectAudioProcessor::getInputChannelName (int channelIndex) const
@@ -447,29 +381,20 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
   for (int i = 0; i < getNumOutputChannels(); ++i)
     _juceOut[i] = new float[samplesPerBlock];
 
-  OSC1 = new Oscillator;
-  OSC1->init (sampleRate, samplesPerBlock);
+  _mixer1 = new AudioSampleBuffer (1, _blockSize);
+  _mixer2 = new AudioSampleBuffer (1, _blockSize);
+  _mixer3 = new AudioSampleBuffer (1, _blockSize);
+  _mixer4 = new AudioSampleBuffer (1, _blockSize);
 
-  OSC2 = new Oscillator;
-  OSC2->init (sampleRate, samplesPerBlock);
+  OSC1 = new Oscillator (sampleRate, samplesPerBlock);
+  OSC2 = new Oscillator (sampleRate, samplesPerBlock);
+  OSC3 = new Oscillator (sampleRate, samplesPerBlock);
+  OSC4 = new Oscillator (sampleRate, samplesPerBlock);
 
-  OSC3 = new Oscillator;
-  OSC3->init (sampleRate, samplesPerBlock);
-
-  OSC4 = new Oscillator;
-  OSC4->init (sampleRate, samplesPerBlock);
-
-  FILTER1 = new Filter;
-  FILTER1->init (sampleRate, samplesPerBlock);
-
-  FILTER2 = new Filter;
-  FILTER2->init (sampleRate, samplesPerBlock);
-
-  FILTER3 = new Filter;
-  FILTER3->init (sampleRate, samplesPerBlock);
-
-  FILTER4 = new Filter;
-  FILTER4->init (sampleRate, samplesPerBlock);
+  FILTER1 = new Filter (sampleRate, samplesPerBlock);
+  FILTER2 = new Filter (sampleRate, samplesPerBlock);
+  FILTER3 = new Filter (sampleRate, samplesPerBlock);
+  FILTER4 = new Filter (sampleRate, samplesPerBlock);
 
   ENV1 = new Envelope (sampleRate,samplesPerBlock);
   ENV2 = new Envelope (sampleRate,samplesPerBlock);
@@ -480,6 +405,8 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
   DLL2 = new Delay (sampleRate,samplesPerBlock);
   DLL3 = new Delay (sampleRate,samplesPerBlock);
   DLL4 = new Delay (sampleRate,samplesPerBlock);
+
+  NOISE1 = new Noise (sampleRate,samplesPerBlock);
 }
 
 void NewProjectAudioProcessor::releaseResources()
@@ -514,43 +441,67 @@ void NewProjectAudioProcessor::releaseResources()
   DLL2 = NULL;
   DLL3 = NULL;
   DLL4 = NULL;
+
+  _mixer1 = NULL;
+  _mixer2 = NULL;
+  _mixer3 = NULL;
+  _mixer4 = NULL;
+
+  NOISE1 = NULL;
 }
+
+//==============================================================================
+//
+//  AUDIO PROCESS CALLBACK FUCTION
+//
+//==============================================================================
 
 void NewProjectAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-  //for (int i = 0; i < _blockSize; i++)
-  //  {
-  //    if (lastValue > 1) lastValue = 0;
-      
-  //    lastValue = lastValue + (increment);
-      
-  //    _juceOut[0][i] = lastValue;
-  //    _juceOut[1][i] = lastValue;
-  //  }
-  
-  //    buffer.copyFrom (0, 0, _juceOut[0], _blockSize);
-  //    buffer.copyFrom (1, 0, _juceOut[1], _blockSize);
+//==============================================================================
+// MIDI ->
 
-  float currentValueOSC1;
-  float currentValueOSC2;
-  float currentValueOSC3;
-  float currentValueOSC4;
-
-  float outputValue;
-  
-  for (int i = 0; i < _blockSize; i++)
+MidiBuffer processedMidi;
+int time;
+MidiMessage m;
+ 
+    for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
-      currentValueOSC1 = OSC1->getNewPhase ();
-      currentValueOSC2 = OSC2->getNewPhase ();
-      currentValueOSC3 = OSC3->getNewPhase ();
-      currentValueOSC4 = OSC4->getNewPhase ();
-
-      _juceOut[0][i] = currentValueOSC1 * _masterVolume;
-      _juceOut[1][i] = currentValueOSC1 * _masterVolume;
+        if (m.isNoteOn())
+        {
+	  
+        }
+        else if (m.isNoteOff())
+        {
+        }
+        else if (m.isAftertouch())
+        {
+        }
+        else if (m.isPitchWheel())
+        {
+        }
     }
+ 
+//==============================================================================
+// AUDIO ->
+    
+  timeOfFirstEvent = midiMessages.getFirstEventTime ();
+  timeOfLastEvent = midiMessages.getLastEventTime ();
+  numEvents = midiMessages.getNumEvents (); 
+  
+  buffer.clear ();
 
-  buffer.copyFrom (0, 0, _juceOut[0], _blockSize);
-  buffer.copyFrom (1, 0, _juceOut[1], _blockSize);
+  _mixer1 = OSC1->processBlock ();
+  _mixer2 = FILTER1->lowpass (*_mixer1);
+
+  //_mixer2 = NOISE1->processBlock ();
+
+  _mixer3 = ENV1->processBlock (*_mixer2);
+
+  for (int i = 0; i < getNumOutputChannels (); i++)
+    {
+      buffer.copyFrom (i, 0, _mixer2[0], 0, 0, _blockSize);
+    }
 }
 
 //==============================================================================

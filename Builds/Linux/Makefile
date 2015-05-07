@@ -51,6 +51,11 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS := \
+  $(OBJDIR)/Envelope_2c60e259.o \
+  $(OBJDIR)/Oscillator_8a6cfe29.o \
+  $(OBJDIR)/Filter_cccb6f01.o \
+  $(OBJDIR)/Noise_da98d57b.o \
+  $(OBJDIR)/Delay_82360b64.o \
   $(OBJDIR)/GUI_f2fe7e1c.o \
   $(OBJDIR)/PluginProcessor_a059e380.o \
   $(OBJDIR)/juce_audio_basics_29afe65c.o \
@@ -86,6 +91,31 @@ clean:
 strip:
 	@echo Stripping Synth
 	-@strip --strip-unneeded $(OUTDIR)/$(TARGET)
+
+$(OBJDIR)/Envelope_2c60e259.o: ../../Source/Envelope.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling Envelope.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/Oscillator_8a6cfe29.o: ../../Source/Oscillator.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling Oscillator.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/Filter_cccb6f01.o: ../../Source/Filter.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling Filter.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/Noise_da98d57b.o: ../../Source/Noise.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling Noise.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/Delay_82360b64.o: ../../Source/Delay.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling Delay.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/GUI_f2fe7e1c.o: ../../Source/GUI.cpp
 	-@mkdir -p $(OBJDIR)
