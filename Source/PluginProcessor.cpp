@@ -5,7 +5,7 @@
 //==============================================================================
 
 #include "PluginProcessor.h"
-#include "GUI.h"
+
 
 //=============================================================================
 //
@@ -58,6 +58,8 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
   DLL2 = NULL;
   DLL3 = NULL;
   DLL4 = NULL;
+  
+  FLT1 = NULL;
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
@@ -91,6 +93,8 @@ NewProjectAudioProcessor::~NewProjectAudioProcessor()
   delete _mixer2;
   delete _mixer3;
   delete _mixer4;
+  
+  delete FLT1;
 }
 
 //==============================================================================
@@ -299,6 +303,8 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
   NOISE2 = new Noise (sampleRate,samplesPerBlock);
   NOISE3 = new Noise (sampleRate,samplesPerBlock);
   NOISE4 = new Noise (sampleRate,samplesPerBlock);
+  
+  FLT1 = new IIRFilter;
 }
 
 void NewProjectAudioProcessor::releaseResources()
@@ -332,6 +338,8 @@ void NewProjectAudioProcessor::releaseResources()
   NOISE2 = NULL;
   NOISE3 = NULL;
   NOISE4 = NULL;
+  
+  FLT1 = NULL;
 }
 
 void NewProjectAudioProcessor::guiToOSC (int index, float value)
@@ -380,30 +388,13 @@ MidiBuffer processedMidi;
 int time;
 MidiMessage m;
 
-int onPosition = 0;
-int offPosition = 0;
+int Position = 0;
   
  for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
    {
-     if (m.isNoteOn())                   // MidiEventType 1
+     if (m.isNoteOn())
        {
-	 noteOnMessage[0][onPosition] = (int)m.getTimeStamp ();
-	 noteOnMessage[1][onPosition] = m.getNoteNumber ();
-	 noteOnMessage[2][onPosition] = m.getVelocity ();
-	 noteOnMessage[3][onPosition] = time;
-	 
-	 onPosition++;
-       }
-     
-     else if (m.isNoteOff())          // MidiEventType 2
-       {
-	 noteOffMessage[0][offPosition] = (int)m.getTimeStamp ();
-	 noteOffMessage[1][offPosition] = m.getNoteNumber ();
-	 noteOffMessage[2][offPosition] = m.getVelocity ();
-	 noteOffMessage[3][offPosition] = time;
-	 
-	 offPosition++;
-       }      
+       }     
    }
  
 //==============================================================================
@@ -415,10 +406,31 @@ int offPosition = 0;
   buffer.clear ();
 
   _mixer1 = OSC1->processBlock ();
+  _mixer2 = OSC2->processBlock ();
+  _mixer3 = OSC3->processBlock ();
+  _mixer4 = OSC4->processBlock ();
+
+  _mixer1->applyGain (0.25);
+  _mixer2->applyGain (0.25);
+  _mixer3->applyGain (0.25);
+  _mixer4->applyGain (0.25);
+  
+  _mixer1->addFrom (0,0,_mixer2[0],0,0,_blockSize);
+  _mixer1->addFrom (0,0,_mixer3[0],0,0,_blockSize);
+  _mixer1->addFrom (0,0,_mixer4[0],0,0,_blockSize);  
   
   for (int i = 0; i < 2; i++) buffer.copyFrom (i, 0, _mixer1[0], 0, 0, _blockSize);
   
   buffer.applyGain (_masterVolume);
+
+  for (int channel = 0; channel < 2; channel++)
+    {
+      for (int i = 0; i < _blockSize; i++)
+	{
+	  if (buffer.getSample (channel, i) <= -0.97) buffer.setSample (channel,i, -0.97);
+	  if (buffer.getSample (channel, i) >= 0.97) buffer.setSample (channel,i, 0.97);
+	}
+    }
 }
 
 //==============================================================================

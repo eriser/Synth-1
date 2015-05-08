@@ -9,13 +9,16 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "Delay.h"
-#include "Noise.h"
-#include "Envelope.h"
-#include "Filter.h"
-#include "Oscillator.h"
-#include "LFO.h"
-#include "Effects.h"
+#include "Oscillator.h"     // funktioniert an sich aber das design.....das muss noch
+
+#include "Envelope.h"       // Under Construction
+
+#include "Delay.h"          // Ungetestet
+#include "Noise.h"          //
+#include "Filter.h"         //
+#include "GUI.h"            //  
+#include "Granular.h"       //
+
 
 //=============================================================================
 //
@@ -77,71 +80,47 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
-
-
     //==============================================================================
     //   GUI Connector
-
     void guiToOSC (int index, float value);
-
-    
     //==============================================================================
     //   DSP Function Pointer
-    
     Oscillator *OSC1;
     Oscillator *OSC2;
     Oscillator *OSC3;
     Oscillator *OSC4;
-
     Filter *FILTER1;
     Filter *FILTER2;
     Filter *FILTER3;
     Filter *FILTER4;
-
     Envelope *ENV1;
     Envelope *ENV2;
     Envelope *ENV3;
     Envelope *ENV4;
-
     Delay *DLL1;
     Delay *DLL2;
     Delay *DLL3;
     Delay *DLL4;
-
     Noise *NOISE1;
     Noise *NOISE2;
     Noise *NOISE3;
     Noise *NOISE4;
-    
+    IIRFilter *FLT1;
     //==============================================================================
     //   Audio Buffer
-    
     AudioSampleBuffer *_mixer1;
     AudioSampleBuffer *_mixer2;
     AudioSampleBuffer *_mixer3;
     AudioSampleBuffer *_mixer4;
-    
     //==============================================================================
     // 
     float _masterVolume = 1;
     int _blockSize;
-
     int timeOfFirstEvent;
     int timeOfLastEvent;
     int numEvents;
-
-    float OSC1FREQ;
-
-    int _time[1024];
-    int _noteOn[1024];
-    int _onVelocity[1024];
-    
-    int noteOnMessage[4][1024];
-    int noteOffMessage[4][1024];
-
     //==============================================================================
-    //   Lookup Tables
-
+    //                                Lookup Tables
     // Midi-Note To Frequency
     float mtof[128] = { 8.1757989156,     8.6619572180,     9.1770239974,     9.7227182413
 		      ,10.3008611535,    10.9133822323,    11.5623257097,    12.2498573744
