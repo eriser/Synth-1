@@ -173,13 +173,10 @@ void GUI::buttonClicked (Button* buttonThatWasClicked)
 	      char temp[25];
 	      sprintf (temp, "%d", processor.noteOnMessage[message][i]);
 	      newContent = temp;
+	      content.append (newContent, 25);
 	    }
 	}
-
-      content.append (newContent, 25);
-      
       Console->setText (content);
-      
         //[/UserButtonCode_textButton]
     }
 
