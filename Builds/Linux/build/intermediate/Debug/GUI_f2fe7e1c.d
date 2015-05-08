@@ -469,4 +469,4 @@ build/intermediate/Debug/GUI_f2fe7e1c.o: ../../Source/GUI.cpp \
  ../../Source/PluginProcessor.h \
  ../../Source/../JuceLibraryCode/JuceHeader.h ../../Source/Delay.h \
  ../../Source/Noise.h ../../Source/Envelope.h ../../Source/Filter.h \
- ../../Source/Oscillator.h
+ ../../Source/Oscillator.h ../../Source/LFO.h ../../Source/Effects.h

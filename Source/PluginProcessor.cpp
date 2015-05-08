@@ -7,6 +7,20 @@
 #include "PluginProcessor.h"
 #include "GUI.h"
 
+//=============================================================================
+//
+//   TimeStampMessage Class
+//
+//=============================================================================
+
+TimeStampMessage::TimeStampMessage ()
+{
+}
+
+TimeStampMessage::~TimeStampMessage ()
+{
+}
+
 //==============================================================================
 //
 //   NewProjectAudioProcessor Class
@@ -15,9 +29,6 @@
 
 NewProjectAudioProcessor::NewProjectAudioProcessor()
 {
-  _juceIn = NULL;
-  _juceOut = NULL;
-
   _mixer1 = NULL;
   _mixer2 = NULL;
   _mixer3 = NULL;
@@ -28,6 +39,11 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
   OSC3 = NULL;
   OSC4 = NULL;
 
+  NOISE1 = NULL;
+  NOISE2 = NULL;
+  NOISE3 = NULL;
+  NOISE4 = NULL;
+  
   FILTER1 = NULL;
   FILTER2 = NULL;
   FILTER3 = NULL;
@@ -42,22 +58,24 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
   DLL2 = NULL;
   DLL3 = NULL;
   DLL4 = NULL;
-
-  NOISE1 = NULL;
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
 {
-  if (_juceIn)
-    {
-      for (int i = 0; i < getNumInputChannels(); ++i)
-	delete _juceIn[i];
-      delete _juceIn;
+  delete DLL1;
+  delete DLL2;
+  delete DLL3;
+  delete DLL4;
 
-      for (int i = 0; i < getNumOutputChannels(); ++i)
-	delete _juceOut[i];
-      delete _juceOut;
-    }
+  delete ENV1;
+  delete ENV2;
+  delete ENV3;
+  delete ENV4;
+
+  delete FILTER1;
+  delete FILTER2;
+  delete FILTER3;
+  delete FILTER4;
 
   delete OSC1;
   delete OSC2;
@@ -65,28 +83,14 @@ NewProjectAudioProcessor::~NewProjectAudioProcessor()
   delete OSC4;
 
   delete NOISE1;
-
-  delete FILTER1;
-  delete FILTER2;
-  delete FILTER3;
-  delete FILTER4;
-
-  delete ENV1;
-  delete ENV2;
-  delete ENV3;
-  delete ENV4;
-
-  delete DLL1;
-  delete DLL2;
-  delete DLL3;
-  delete DLL4;
-
+  delete NOISE2;
+  delete NOISE3;
+  delete NOISE4;
+  
   delete _mixer1;
   delete _mixer2;
   delete _mixer3;
   delete _mixer4;
-
-  delete bufferRevolver;
 }
 
 //==============================================================================
@@ -97,7 +101,7 @@ const String NewProjectAudioProcessor::getName() const
 
 int NewProjectAudioProcessor::getNumParameters()
 {
-    return 33;
+    return 17;
 }
 
 float NewProjectAudioProcessor::getParameter (int index)
@@ -107,99 +111,32 @@ float NewProjectAudioProcessor::getParameter (int index)
 
 void NewProjectAudioProcessor::setParameter (int index, float newValue)
 {
-  //=MASTER=====================================
-  //
-  // Master Volume
+  //=MASTER=
   if (index == 0) _masterVolume = newValue;
 
-  //=OSC1=======================================
-  //
-  // OSC1 Pitch Coarse
-  if (index == 1) OSC1->setFreq (newValue*127);
-  // OSC1 Pitch Fine
-  if (index == 2) ;
-  // OSC1 N.C.
-  if (index == 3) ;
-  // OSC1 N.C.
-  if (index == 4) ;
+  //=OSC1=
+  if (index == 1) OSC1->setFreq (mtof[(int)(newValue*127)]);
+  if (index == 2) OSC1->setPW ((newValue * 0.9)+ 0.05);
+  if (index == 3) OSC1->setShape (newValue*4);
+  if (index == 4) OSC1->setGain (newValue);
 
-  //=OSC2=======================================
-  //
-  // OSC2 Pitch Coarse
-  if (index == 5) OSC2->setFreq (newValue*127);
-  // OSC2 Pitch Fine
-  if (index == 6) ;
-  // OSC2 N.C.
-  if (index == 7) ;
-  // OSC2 N.C.
-  if (index == 8) ;
+  //=OSC2=
+  if (index == 5) OSC2->setFreq (mtof[(int)(newValue*127)]);
+  if (index == 6) OSC2->setPW ((newValue * 0.9)+ 0.05);
+  if (index == 7) OSC2->setShape (newValue*4);
+  if (index == 8) OSC2->setGain (newValue);
 
-  //=OSC3=======================================
-  //
-  // OSC3 Pitch Coarse
-  if (index == 9) OSC3->setFreq (newValue*127);
-  // OSC3 Pitch Fine
-  if (index == 10) ;
-  // OSC3 N.C.
-  if (index == 11) ;
-  // OSC3 N.C.
-  if (index == 12) ;
+  //=OSC3=
+  if (index == 9) OSC3->setFreq (mtof[(int)(newValue*127)]);
+  if (index == 10) OSC3->setPW ((newValue * 0.9)+ 0.05);
+  if (index == 11) OSC3->setShape (newValue*4);
+  if (index == 12) OSC3->setGain (newValue);
 
-  //=OSC4=======================================
-  //
-  // OSC4 Pitch Coarse
-  if (index == 13) OSC4->setFreq (newValue*127);
-  // OSC4 Pitch Fine
-  if (index == 14) ;
-  // OSC4 N.C.
-  if (index == 15) ;
-  // OSC4 N.C.
-  if (index == 16) ;
-
-  //=ENV1=======================================
-  //
-  // ENV1 Attack
-  if (index == 17) ENV1->setAttack (newValue*512);
-  // ENV1 Decay
-  if (index == 18) ENV1->setDecay (newValue*512);
-  // ENV1 Sustain
-  if (index == 19) ENV1->setSustain (newValue);
-  // ENV1 Release
-  if (index == 20) ENV1->setRelease (newValue*512);
-
-  //=ENV2=======================================
-  //
-  // ENV2 Attack
-  if (index == 21) ENV2->setAttack (newValue*512);
-  // ENV2 Decay
-  if (index == 22) ENV2->setDecay (newValue*512);
-  // ENV2 Sustain
-  if (index == 23) ENV2->setSustain (newValue);
-  // ENV2 Release
-  if (index == 24) ENV2->setRelease (newValue*512);  
-
-  //=ENV3=======================================
-  //
-  // ENV3 Attack
-  if (index == 25) ENV3->setAttack (newValue*512);
-  // ENV3 Decay
-  if (index == 26) ENV3->setDecay (newValue*512);
-  // ENV3 Sustain
-  if (index == 27) ENV3->setSustain (newValue);
-  // ENV3 Release
-  if (index == 28) ENV3->setRelease (newValue*512);
-
-  //=ENV4=======================================
-  //
-  // ENV4 Attack
-  if (index == 29) ENV4->setAttack (newValue*512);
-  // ENV4 Decay
-  if (index == 30) ENV4->setDecay (newValue*512);
-  // ENV4 Sustain
-  if (index == 31) ENV4->setSustain (newValue);
-  // ENV4 Release
-  if (index == 32) ENV4->setRelease (newValue*512);  
-  
+  //=OSC4=
+  if (index == 13) OSC4->setFreq (mtof[(int)(newValue*127)]);
+  if (index == 14) OSC4->setPW ((newValue * 0.9)+ 0.05);
+  if (index == 15) OSC4->setShape (newValue*4);
+  if (index == 16) OSC4->setGain (newValue);  
 }
 
 const String NewProjectAudioProcessor::getParameterName (int index)
@@ -207,92 +144,52 @@ const String NewProjectAudioProcessor::getParameterName (int index)
   if(index == 0) return "Master Volume";
 
   if(index == 1)  return "OSC1 Pitch Coarse";
-  if(index == 2)  return "OSC1 Pitch Fine";
-  if(index == 3)  return "OSC1 N.C.";
-  if(index == 4)  return "OSC1 N.C.";
+  if(index == 2)  return "OSC1 PulseWidth";
+  if(index == 3)  return "OSC1 Shape";
+  if(index == 4)  return "OSC1 Gain";
 
   if(index == 5)  return "OSC2 Pitch Coarse";
-  if(index == 6)  return "OSC2 Pitch Fine";
-  if(index == 7)  return "OSC2 N.C.";
-  if(index == 8)  return "OSC2 N.C.";
+  if(index == 6)  return "OSC2 PulseWidth";
+  if(index == 7)  return "OSC2 Shape";
+  if(index == 8)  return "OSC2 Gain";
 
   if(index == 9)  return "OSC3 Pitch Coarse";
-  if(index == 10) return "OSC3 Pitch Fine";
-  if(index == 11) return "OSC3 N.C.";
-  if(index == 12) return "OSC3 N.C.";
+  if(index == 10) return "OSC3 PulseWidth";
+  if(index == 11) return "OSC3 Shape";
+  if(index == 12) return "OSC3 Gain";
 
   if(index == 13) return "OSC4 Pitch Coarse";
-  if(index == 14) return "OSC4 Pitch Fine";
-  if(index == 15) return "OSC4 N.C.";
-  if(index == 16) return "OSC4 N.C.";
+  if(index == 14) return "OSC4 PulseWidth";
+  if(index == 15) return "OSC4 Shape";
+  if(index == 16) return "OSC4 Gain";
 
-  if(index == 17) return "ENV1 Attack";
-  if(index == 18) return "ENV1 Decay";
-  if(index == 19) return "ENV1 Sustain";
-  if(index == 20) return "ENV1 Release";
-
-  if(index == 21) return "ENV2 Attack";
-  if(index == 22) return "ENV2 Decay";
-  if(index == 23) return "ENV2 Sustain";
-  if(index == 24) return "ENV2 Release";
-
-  if(index == 25) return "ENV3 Attack";
-  if(index == 26) return "ENV3 Decay";
-  if(index == 27) return "ENV3 Sustain";
-  if(index == 28) return "ENV3 Release";
-
-  if(index == 29) return "ENV4 Attack";
-  if(index == 30) return "ENV4 Decay";
-  if(index == 31) return "ENV4 Sustain";
-  if(index == 32) return "ENV4 Release";
-  
   return String();
 }
 
 const String NewProjectAudioProcessor::getParameterText (int index)
 {
-  if(index == 0)  return "Master Volume";
+  if(index == 0)   return "xxx";
 
-  if(index == 1)  return "OSC1 Pitch Coarse";
-  if(index == 2)  return "OSC1 Pitch Fine";
-  if(index == 3)  return "OSC1 N.C.";
-  if(index == 4)  return "OSC1 N.C.";
+  if(index == 1)   return OSC1->getFreq ();
+  if(index == 2)   return OSC1->getPW ();
+  if(index == 3)   return OSC1->getShape ();
+  if(index == 4)   return OSC1->getGain ();
 
-  if(index == 5)  return "OSC2 Pitch Coarse";
-  if(index == 6)  return "OSC2 Pitch Fine";
-  if(index == 7)  return "OSC2 N.C.";
-  if(index == 8)  return "OSC2 N.C.";
+  if(index == 5)   return OSC2->getFreq ();
+  if(index == 6)   return OSC2->getPW ();
+  if(index == 7)   return OSC2->getShape ();
+  if(index == 8)   return OSC2->getGain ();
 
-  if(index == 9)  return "OSC3 Pitch Coarse";
-  if(index == 10) return "OSC3 Pitch Fine";
-  if(index == 11) return "OSC3 N.C.";
-  if(index == 12) return "OSC3 N.C.";
+  if(index == 9)   return OSC3->getFreq ();
+  if(index == 10)  return OSC3->getPW ();
+  if(index == 11)  return OSC3->getShape ();
+  if(index == 12)  return OSC3->getGain ();
 
-  if(index == 13) return "OSC4 Pitch Coarse";
-  if(index == 14) return "OSC4 Pitch Fine";
-  if(index == 15) return "OSC4 N.C.";
-  if(index == 16) return "OSC4 N.C.";
+  if(index == 13)  return OSC4->getFreq ();
+  if(index == 14)  return OSC4->getPW ();
+  if(index == 15)  return OSC4->getShape ();
+  if(index == 16)  return OSC4->getGain ();
 
-  if(index == 17) return "ENV1 Attack";
-  if(index == 18) return "ENV1 Decay";
-  if(index == 19) return "ENV1 Sustain";
-  if(index == 20) return "ENV1 Release";
-
-  if(index == 21) return "ENV2 Attack";
-  if(index == 22) return "ENV2 Decay";
-  if(index == 23) return "ENV2 Sustain";
-  if(index == 24) return "ENV2 Release";
-
-  if(index == 25) return "ENV3 Attack";
-  if(index == 26) return "ENV3 Decay";
-  if(index == 27) return "ENV3 Sustain";
-  if(index == 28) return "ENV3 Release";
-
-  if(index == 29) return "ENV4 Attack";
-  if(index == 30) return "ENV4 Decay";
-  if(index == 31) return "ENV4 Sustain";
-  if(index == 32) return "ENV4 Release";
-  
   return String();
 }
 
@@ -373,14 +270,6 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
   _blockSize = samplesPerBlock;
   
-  _juceIn = new float*[getNumInputChannels()];
-  for (int i = 0; i < getNumInputChannels(); ++i)
-    _juceIn[i] = new float[samplesPerBlock];
-
-  _juceOut = new float*[getNumOutputChannels()];
-  for (int i = 0; i < getNumOutputChannels(); ++i)
-    _juceOut[i] = new float[samplesPerBlock];
-
   _mixer1 = new AudioSampleBuffer (1, _blockSize);
   _mixer2 = new AudioSampleBuffer (1, _blockSize);
   _mixer3 = new AudioSampleBuffer (1, _blockSize);
@@ -407,21 +296,13 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
   DLL4 = new Delay (sampleRate,samplesPerBlock);
 
   NOISE1 = new Noise (sampleRate,samplesPerBlock);
+  NOISE2 = new Noise (sampleRate,samplesPerBlock);
+  NOISE3 = new Noise (sampleRate,samplesPerBlock);
+  NOISE4 = new Noise (sampleRate,samplesPerBlock);
 }
 
 void NewProjectAudioProcessor::releaseResources()
 {
-  if (_juceIn)
-    {
-      for (int i = 0; i < getNumInputChannels(); ++i)
-	delete _juceIn[i];
-      delete _juceIn;
-
-      for (int i = 0; i < getNumOutputChannels(); ++i)
-	delete _juceOut[i];
-      delete _juceOut;
-    }
-
   OSC1 = NULL;
   OSC2 = NULL;
   OSC3 = NULL;
@@ -448,67 +329,103 @@ void NewProjectAudioProcessor::releaseResources()
   _mixer4 = NULL;
 
   NOISE1 = NULL;
+  NOISE2 = NULL;
+  NOISE3 = NULL;
+  NOISE4 = NULL;
+}
+
+void NewProjectAudioProcessor::guiToOSC (int index, float value)
+{
+  if      (index == 0)  _masterVolume = value;
+  
+  else if (index == 1)   OSC1->setFreq (value);
+  else if (index == 2)   OSC1->setPW (value);
+  else if (index == 3)   OSC1->setShape (value);
+  else if (index == 4)   OSC1->setGain (value);
+
+  else if (index == 5)   OSC2->setFreq (value);
+  else if (index == 6)   OSC2->setPW (value);
+  else if (index == 7)   OSC2->setShape (value);
+  else if (index == 8)   OSC2->setGain (value);
+
+  else if (index == 9)   OSC3->setFreq (value);
+  else if (index == 10)  OSC3->setPW (value);
+  else if (index == 11)  OSC3->setShape (value);
+  else if (index == 12)  OSC3->setGain (value);
+
+  else if (index == 13)  OSC4->setFreq (value);
+  else if (index == 14)  OSC4->setPW (value);
+  else if (index == 15)  OSC4->setShape (value);
+  else if (index == 16)  OSC4->setGain (value);
 }
 
 //==============================================================================
-//
-//  AUDIO PROCESS CALLBACK FUCTION
-//
-//==============================================================================
+
+  //   //    //==================================//    //    //
+ //   //    //                                  //    //    //
+/////////////  AUDIO PROCESS CALLBACK FUCTION  //////////////
+    //    //                                  //    //    //
+   //    //==================================//    //    //
 
 void NewProjectAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
+  
 //==============================================================================
-// MIDI ->
+//  
+// MIDI -> ProcessBlock
+//  
+//==============================================================================
 
 MidiBuffer processedMidi;
 int time;
 MidiMessage m;
- 
-    for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
-    {
-        if (m.isNoteOn())
-        {
-	  
-        }
-        else if (m.isNoteOff())
-        {
-        }
-        else if (m.isAftertouch())
-        {
-        }
-        else if (m.isPitchWheel())
-        {
-        }
-    }
+
+int onPosition = 0;
+int offPosition = 0;
+  
+ for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
+   {
+     if (m.isNoteOn())                   // MidiEventType 1
+       {
+	 noteOnMessage[0][onPosition] = (int)m.getTimeStamp ();
+	 noteOnMessage[1][onPosition] = m.getNoteNumber ();
+	 noteOnMessage[2][onPosition] = m.getVelocity ();
+	 noteOnMessage[3][onPosition] = time;
+	 
+	 onPosition++;
+       }
+     
+     else if (m.isNoteOff())          // MidiEventType 2
+       {
+	 noteOffMessage[0][offPosition] = (int)m.getTimeStamp ();
+	 noteOffMessage[1][offPosition] = m.getNoteNumber ();
+	 noteOffMessage[2][offPosition] = m.getVelocity ();
+	 noteOffMessage[3][offPosition] = time;
+	 
+	 offPosition++;
+       }      
+   }
  
 //==============================================================================
-// AUDIO ->
-    
-  timeOfFirstEvent = midiMessages.getFirstEventTime ();
-  timeOfLastEvent = midiMessages.getLastEventTime ();
-  numEvents = midiMessages.getNumEvents (); 
+//
+// AUDIO -> ProcessBlock
+//
+//==============================================================================    
   
   buffer.clear ();
 
   _mixer1 = OSC1->processBlock ();
-  _mixer2 = FILTER1->lowpass (*_mixer1);
-
-  //_mixer2 = NOISE1->processBlock ();
-
-  _mixer3 = ENV1->processBlock (*_mixer2);
-
-  for (int i = 0; i < getNumOutputChannels (); i++)
-    {
-      buffer.copyFrom (i, 0, _mixer2[0], 0, 0, _blockSize);
-    }
+  
+  for (int i = 0; i < 2; i++) buffer.copyFrom (i, 0, _mixer1[0], 0, 0, _blockSize);
+  
+  buffer.applyGain (_masterVolume);
 }
 
 //==============================================================================
 bool NewProjectAudioProcessor::hasEditor() const
 {
-  //return true; // (change this to false if you choose to not supply an editor)
-    return false; // (change this to false if you choose to not supply an editor)
+  return true; // (change this to false if you choose to not supply an editor)
+  //return false; // (change this to false if you choose to not supply an editor)
 }
 
 AudioProcessorEditor* NewProjectAudioProcessor::createEditor()

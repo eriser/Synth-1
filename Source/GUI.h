@@ -35,7 +35,9 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class GUI  : public AudioProcessorEditor
+class GUI  : public AudioProcessorEditor,
+             public SliderListener,
+             public ButtonListener
 {
 public:
     //==============================================================================
@@ -48,6 +50,8 @@ public:
 
     void paint (Graphics& g);
     void resized();
+    void sliderValueChanged (Slider* sliderThatWasMoved);
+    void buttonClicked (Button* buttonThatWasClicked);
 
 
 
@@ -57,6 +61,12 @@ private:
     //[/UserVariables]
 
     //==============================================================================
+    ScopedPointer<Slider> osc1Pitch;
+    ScopedPointer<Slider> osc1PulseWidth;
+    ScopedPointer<Slider> osc1Shape;
+    ScopedPointer<Slider> osc1Gain;
+    ScopedPointer<TextEditor> Console;
+    ScopedPointer<TextButton> textButton;
 
 
     //==============================================================================

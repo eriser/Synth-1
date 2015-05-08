@@ -13,6 +13,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#define PI 3.14159265
+
 //==============================================================================
 //
 //   Oscillator Class
@@ -27,11 +29,28 @@ class Oscillator
   ~Oscillator ();
   
   void setFreq (float freq);
-  float getFreq (void);
-  void calcIncrement (void);
+  String getFreq (void);
+  float getFreqRaw (void);
+
   void setPhase (float phase);
   float getPhase (void);
-  AudioSampleBuffer* processBlock ();
+  
+  void setGain (float gain);
+  String getGain (void);
+
+  void setShape (int shape);
+  String getShape (void);
+
+  void setPW (float width);
+  String getPW (void);
+
+  float calcIncrement (float freq);
+
+  void phasor (float freq);
+
+  float waveshaper (float signal);
+
+  AudioSampleBuffer* processBlock (void);
   
  private:
   
@@ -40,7 +59,9 @@ class Oscillator
   float _phase;
   float _freq;
   float _increment;
-  bool _recalcInc = true;
+  float _gain;
+  int _waveshape = 1;
+  float _pwmThreshold = 0.5;
   
   // Buffer Pointer
   AudioSampleBuffer *_outputBuffer;

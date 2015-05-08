@@ -93,7 +93,7 @@ void Envelope::triggerRelease (void)
 
 AudioSampleBuffer* Envelope::processBlock (AudioSampleBuffer& inputBuffer)
 { 
-  inputBuffer.applyGainRamp (0, 0, _blockSize, 0, 1);
+  inputBuffer.applyGainRamp (0, 0, _blockSize, 0, _sustain);
 
   _outputBuffer = &inputBuffer;
 

@@ -51,6 +51,8 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS := \
+  $(OBJDIR)/Effects_68667863.o \
+  $(OBJDIR)/LFO_e2398216.o \
   $(OBJDIR)/Envelope_2c60e259.o \
   $(OBJDIR)/Oscillator_8a6cfe29.o \
   $(OBJDIR)/Filter_cccb6f01.o \
@@ -91,6 +93,16 @@ clean:
 strip:
 	@echo Stripping Synth
 	-@strip --strip-unneeded $(OUTDIR)/$(TARGET)
+
+$(OBJDIR)/Effects_68667863.o: ../../Source/Effects.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling Effects.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/LFO_e2398216.o: ../../Source/LFO.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling LFO.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/Envelope_2c60e259.o: ../../Source/Envelope.cpp
 	-@mkdir -p $(OBJDIR)
