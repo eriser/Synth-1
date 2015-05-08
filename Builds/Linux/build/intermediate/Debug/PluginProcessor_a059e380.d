@@ -467,7 +467,6 @@ build/intermediate/Debug/PluginProcessor_a059e380.o: \
  ../../Source/../JuceLibraryCode/modules/juce_video/../../../../../../../juce/modules/juce_video/playback/juce_DirectShowComponent.h \
  ../../Source/../JuceLibraryCode/modules/juce_video/../../../../../../../juce/modules/juce_video/playback/juce_QuickTimeMovieComponent.h \
  ../../Source/../JuceLibraryCode/modules/juce_video/../../../../../../../juce/modules/juce_video/capture/juce_CameraDevice.h \
- ../../Source/Delay.h ../../Source/Noise.h ../../Source/Envelope.h \
- ../../Source/Filter.h ../../Source/Oscillator.h ../../Source/LFO.h \
- ../../Source/Effects.h ../../Source/GUI.h \
- ../../JuceLibraryCode/JuceHeader.h
+ ../../Source/Oscillator.h ../../Source/Envelope.h ../../Source/Delay.h \
+ ../../Source/Noise.h ../../Source/Filter.h ../../Source/Granular.h \
+ ../../Source/GUI.h ../../JuceLibraryCode/JuceHeader.h

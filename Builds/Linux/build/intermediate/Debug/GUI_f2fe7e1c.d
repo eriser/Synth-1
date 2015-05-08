@@ -467,6 +467,6 @@ build/intermediate/Debug/GUI_f2fe7e1c.o: ../../Source/GUI.cpp \
  ../../JuceLibraryCode/modules/juce_video/../../../../../../../juce/modules/juce_video/playback/juce_QuickTimeMovieComponent.h \
  ../../JuceLibraryCode/modules/juce_video/../../../../../../../juce/modules/juce_video/capture/juce_CameraDevice.h \
  ../../Source/PluginProcessor.h \
- ../../Source/../JuceLibraryCode/JuceHeader.h ../../Source/Delay.h \
- ../../Source/Noise.h ../../Source/Envelope.h ../../Source/Filter.h \
- ../../Source/Oscillator.h ../../Source/LFO.h ../../Source/Effects.h
+ ../../Source/../JuceLibraryCode/JuceHeader.h ../../Source/Oscillator.h \
+ ../../Source/Envelope.h ../../Source/Delay.h ../../Source/Noise.h \
+ ../../Source/Filter.h ../../Source/Granular.h

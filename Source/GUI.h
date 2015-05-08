@@ -49,8 +49,6 @@ public:
     void paint (Graphics& g);
     void resized();
 
-
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     NewProjectAudioProcessor& processor;

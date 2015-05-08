@@ -16,7 +16,7 @@
 #include "Delay.h"          // Ungetestet
 #include "Noise.h"          //
 #include "Filter.h"         //
-#include "GUI.h"            //  
+            //  
 #include "Granular.h"       //
 
 
@@ -119,6 +119,7 @@ public:
     int timeOfFirstEvent;
     int timeOfLastEvent;
     int numEvents;
+    int _delay;
     //==============================================================================
     //                                Lookup Tables
     // Midi-Note To Frequency

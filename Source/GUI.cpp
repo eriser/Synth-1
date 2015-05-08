@@ -38,7 +38,7 @@ GUI::GUI (NewProjectAudioProcessor& p)
 
 
     //[Constructor] You can add your own custom stuff here..
-    //[/Constructor]
+     //[/Constructor]
 }
 
 GUI::~GUI()
@@ -58,7 +58,7 @@ void GUI::paint (Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colours::white);
+    g.fillAll (Colours::grey);
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]

@@ -5,7 +5,7 @@
 //==============================================================================
 
 #include "PluginProcessor.h"
-
+#include "GUI.h"
 
 //=============================================================================
 //
@@ -58,8 +58,6 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
   DLL2 = NULL;
   DLL3 = NULL;
   DLL4 = NULL;
-  
-  FLT1 = NULL;
 }
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor()
@@ -93,8 +91,6 @@ NewProjectAudioProcessor::~NewProjectAudioProcessor()
   delete _mixer2;
   delete _mixer3;
   delete _mixer4;
-  
-  delete FLT1;
 }
 
 //==============================================================================
@@ -105,7 +101,7 @@ const String NewProjectAudioProcessor::getName() const
 
 int NewProjectAudioProcessor::getNumParameters()
 {
-    return 17;
+    return 18;
 }
 
 float NewProjectAudioProcessor::getParameter (int index)
@@ -167,6 +163,8 @@ const String NewProjectAudioProcessor::getParameterName (int index)
   if(index == 15) return "OSC4 Shape";
   if(index == 16) return "OSC4 Gain";
 
+  if(index == 17) return "DELAY";
+
   return String();
 }
 
@@ -193,6 +191,8 @@ const String NewProjectAudioProcessor::getParameterText (int index)
   if(index == 14)  return OSC4->getPW ();
   if(index == 15)  return OSC4->getShape ();
   if(index == 16)  return OSC4->getGain ();
+
+  if(index == 17) return "DELAY";
 
   return String();
 }
@@ -303,8 +303,6 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
   NOISE2 = new Noise (sampleRate,samplesPerBlock);
   NOISE3 = new Noise (sampleRate,samplesPerBlock);
   NOISE4 = new Noise (sampleRate,samplesPerBlock);
-  
-  FLT1 = new IIRFilter;
 }
 
 void NewProjectAudioProcessor::releaseResources()
@@ -338,8 +336,6 @@ void NewProjectAudioProcessor::releaseResources()
   NOISE2 = NULL;
   NOISE3 = NULL;
   NOISE4 = NULL;
-  
-  FLT1 = NULL;
 }
 
 void NewProjectAudioProcessor::guiToOSC (int index, float value)
@@ -365,6 +361,8 @@ void NewProjectAudioProcessor::guiToOSC (int index, float value)
   else if (index == 14)  OSC4->setPW (value);
   else if (index == 15)  OSC4->setShape (value);
   else if (index == 16)  OSC4->setGain (value);
+
+  else if (index == 17)  _delay = (int)value * _blockSize;
 }
 
 //==============================================================================
@@ -396,7 +394,9 @@ int Position = 0;
        {
        }     
    }
- 
+
+ midiMessages.clear ();
+   
 //==============================================================================
 //
 // AUDIO -> ProcessBlock
@@ -419,7 +419,10 @@ int Position = 0;
   _mixer1->addFrom (0,0,_mixer3[0],0,0,_blockSize);
   _mixer1->addFrom (0,0,_mixer4[0],0,0,_blockSize);  
   
-  for (int i = 0; i < 2; i++) buffer.copyFrom (i, 0, _mixer1[0], 0, 0, _blockSize);
+  for (int i = 0; i < 2; i++)
+    {
+      buffer.copyFrom (i, 0, _mixer1[0], 0, 0, _blockSize);
+    }
   
   buffer.applyGain (_masterVolume);
 
@@ -430,7 +433,7 @@ int Position = 0;
 	  if (buffer.getSample (channel, i) <= -0.97) buffer.setSample (channel,i, -0.97);
 	  if (buffer.getSample (channel, i) >= 0.97) buffer.setSample (channel,i, 0.97);
 	}
-    }
+    }  
 }
 
 //==============================================================================
