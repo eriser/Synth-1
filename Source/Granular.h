@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Granular.h
-    Created: 8 May 2015 3:20:44am
-    Author:  mobilestudio
+  Granular.h
+  Created: 8 May 2015 3:20:44am
+  Author:  mobilestudio
 
   ==============================================================================
 */
@@ -21,12 +21,12 @@
 
 class Granular
 {
-public:
+ public:
     
-    Granular ();
-    ~Granular ();
+  Granular ();
+  ~Granular ();
 
-private:
+ private:
 
 };
 

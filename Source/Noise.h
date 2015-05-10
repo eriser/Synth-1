@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Noise.h
-    Created: 7 May 2015 8:53:54pm
-    Author:  mobilestudio
+  Noise.h
+  Created: 7 May 2015 8:53:54pm
+  Author:  mobilestudio
 
   ==============================================================================
 */
@@ -21,14 +21,14 @@
 
 class Noise
 {
-public:
+ public:
 
   Noise (double sampleRate, int blockSize);
   ~Noise ();
 
   AudioSampleBuffer* processBlock (void);
   
-private:
+ private:
 
   double _sampleRate;
   int _blockSize;

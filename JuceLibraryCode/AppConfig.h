@@ -22,11 +22,13 @@
 // [END_USER_CODE_SECTION]
 
 //==============================================================================
+#define JUCE_MODULE_AVAILABLE_dRowAudio                     1
 #define JUCE_MODULE_AVAILABLE_juce_audio_basics             1
 #define JUCE_MODULE_AVAILABLE_juce_audio_devices            1
 #define JUCE_MODULE_AVAILABLE_juce_audio_formats            1
 #define JUCE_MODULE_AVAILABLE_juce_audio_plugin_client      1
 #define JUCE_MODULE_AVAILABLE_juce_audio_processors         1
+#define JUCE_MODULE_AVAILABLE_juce_audio_utils              1
 #define JUCE_MODULE_AVAILABLE_juce_core                     1
 #define JUCE_MODULE_AVAILABLE_juce_cryptography             1
 #define JUCE_MODULE_AVAILABLE_juce_data_structures          1
@@ -36,6 +38,21 @@
 #define JUCE_MODULE_AVAILABLE_juce_gui_extra                1
 #define JUCE_MODULE_AVAILABLE_juce_opengl                   1
 #define JUCE_MODULE_AVAILABLE_juce_video                    1
+
+//==============================================================================
+// dRowAudio flags:
+
+#ifndef    DROWAUDIO_USE_FFTREAL
+ //#define DROWAUDIO_USE_FFTREAL
+#endif
+
+#ifndef    DROWAUDIO_USE_SOUNDTOUCH
+ //#define DROWAUDIO_USE_SOUNDTOUCH
+#endif
+
+#ifndef    DROWAUDIO_USE_CURL
+ //#define DROWAUDIO_USE_CURL
+#endif
 
 //==============================================================================
 // juce_audio_devices flags:
@@ -99,7 +116,7 @@
 // juce_audio_processors flags:
 
 #ifndef    JUCE_PLUGINHOST_VST
- //#define JUCE_PLUGINHOST_VST
+ #define   JUCE_PLUGINHOST_VST 1
 #endif
 
 #ifndef    JUCE_PLUGINHOST_VST3
@@ -137,52 +154,52 @@
 // juce_graphics flags:
 
 #ifndef    JUCE_USE_COREIMAGE_LOADER
- //#define JUCE_USE_COREIMAGE_LOADER
+ #define   JUCE_USE_COREIMAGE_LOADER 0
 #endif
 
 #ifndef    JUCE_USE_DIRECTWRITE
- //#define JUCE_USE_DIRECTWRITE
+ #define   JUCE_USE_DIRECTWRITE 1
 #endif
 
 //==============================================================================
 // juce_gui_basics flags:
 
 #ifndef    JUCE_ENABLE_REPAINT_DEBUGGING
- //#define JUCE_ENABLE_REPAINT_DEBUGGING
+ #define   JUCE_ENABLE_REPAINT_DEBUGGING 0
 #endif
 
 #ifndef    JUCE_USE_XSHM
- //#define JUCE_USE_XSHM
+ #define   JUCE_USE_XSHM 1
 #endif
 
 #ifndef    JUCE_USE_XRENDER
- //#define JUCE_USE_XRENDER
+ #define   JUCE_USE_XRENDER 1
 #endif
 
 #ifndef    JUCE_USE_XCURSOR
- //#define JUCE_USE_XCURSOR
+ #define   JUCE_USE_XCURSOR 1
 #endif
 
 //==============================================================================
 // juce_gui_extra flags:
 
 #ifndef    JUCE_WEB_BROWSER
- //#define JUCE_WEB_BROWSER
+ #define   JUCE_WEB_BROWSER 0
 #endif
 
 #ifndef    JUCE_ENABLE_LIVE_CONSTANT_EDITOR
- //#define JUCE_ENABLE_LIVE_CONSTANT_EDITOR
+ #define   JUCE_ENABLE_LIVE_CONSTANT_EDITOR 1
 #endif
 
 //==============================================================================
 // juce_video flags:
 
 #ifndef    JUCE_DIRECTSHOW
- //#define JUCE_DIRECTSHOW
+ #define   JUCE_DIRECTSHOW 0
 #endif
 
 #ifndef    JUCE_MEDIAFOUNDATION
- //#define JUCE_MEDIAFOUNDATION
+ #define   JUCE_MEDIAFOUNDATION 0
 #endif
 
 #ifndef    JUCE_QUICKTIME
@@ -190,7 +207,7 @@
 #endif
 
 #ifndef    JUCE_USE_CAMERA
- //#define JUCE_USE_CAMERA
+ #define   JUCE_USE_CAMERA 0
 #endif
 
 

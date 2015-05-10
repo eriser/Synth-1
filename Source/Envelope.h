@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Envelope.h
-    Created: 7 May 2015 8:54:55pm
-    Author:  mobilestudio
+  Envelope.h
+  Created: 7 May 2015 8:54:55pm
+  Author:  mobilestudio
 
   ==============================================================================
 */
@@ -21,7 +21,7 @@
 
 class Envelope
 {
-public:
+ public:
   
   Envelope (double sampleRate, int blockSize);
   ~Envelope ();
@@ -42,7 +42,7 @@ public:
 
   AudioSampleBuffer* processBlock (AudioSampleBuffer& inputBuffer);
 
-private:
+ private:
   
   double _sampleRate;
   int _blockSize;

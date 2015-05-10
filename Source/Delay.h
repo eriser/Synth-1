@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Delay.h
-    Created: 7 May 2015 8:51:22pm
-    Author:  mobilestudio
+  Delay.h
+  Created: 7 May 2015 8:51:22pm
+  Author:  mobilestudio
 
   ==============================================================================
 */
@@ -21,12 +21,12 @@
 
 class Delay
 {
-public:
+ public:
   
   Delay (double sampleRate, int blockSize);
   ~Delay ();
   
-private:
+ private:
   
   double _sampleRate;
   int _blockSize;

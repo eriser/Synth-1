@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Filter.cpp
-    Created: 7 May 2015 8:57:23pm
-    Author:  mobilestudio
+  Filter.cpp
+  Created: 7 May 2015 8:57:23pm
+  Author:  mobilestudio
 
   ==============================================================================
 */
@@ -70,24 +70,24 @@ AudioSampleBuffer* Filter::processBlock (AudioSampleBuffer& inputBuffer)
   float ys4 = y_4;                                                        
                                                                           
   /*                                                                          
-  while (n--)                                                             
-    {                                                                     
-     if (_cutoff > 8140) _cutoff = 8140.;
-     _resonance = calc_k(_cutoff, _resonance);
+									      while (n--)                                                             
+									      {                                                                     
+									      if (_cutoff > 8140) _cutoff = 8140.;
+									      _resonance = calc_k(_cutoff, _resonance);
      
-     pt =*p;
-     pt1=(pt+1)*0.76923077;
-     in = *in1++ - *k*ys4;
-     ys1 = (pt1)*in + 0.3*x1 - pt*ys1;
-     x1 = in;
-     ys2 = (pt1)*ys1 + 0.3*x2 - pt*ys2;
-     x2 = ys1;
-     ys3 = (pt1)*ys2 + 0.3 *x3 - pt*ys3;
-     x3 = ys2;
-     ys4 = (pt1)*ys3 + 0.3*x4 - pt*ys4;
-     x4 = ys3;
-     *out++ = ys4;
-    }
+									      pt =*p;
+									      pt1=(pt+1)*0.76923077;
+									      in = *in1++ - *k*ys4;
+									      ys1 = (pt1)*in + 0.3*x1 - pt*ys1;
+									      x1 = in;
+									      ys2 = (pt1)*ys1 + 0.3*x2 - pt*ys2;
+									      x2 = ys1;
+									      ys3 = (pt1)*ys2 + 0.3 *x3 - pt*ys3;
+									      x3 = ys2;
+									      ys4 = (pt1)*ys3 + 0.3*x4 - pt*ys4;
+									      x4 = ys3;
+									      *out++ = ys4;
+									      }
   */
 
   y_1 = ys1;

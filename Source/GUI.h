@@ -30,12 +30,13 @@
 //==============================================================================
 /**
                                                                     //[Comments]
-    An auto-generated component, created by the Introjucer.
+ An auto-generated component, created by the Introjucer.
 
-    Describe your class and how it works here!
+ Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class GUI  : public AudioProcessorEditor
+class GUI  : public AudioProcessorEditor,
+             public SliderListener
 {
 public:
     //==============================================================================
@@ -48,13 +49,20 @@ public:
 
     void paint (Graphics& g);
     void resized();
+    void sliderValueChanged (Slider* sliderThatWasMoved);
+
+
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    NewProjectAudioProcessor& processor;
+  NewProjectAudioProcessor& processor;
     //[/UserVariables]
 
     //==============================================================================
+    ScopedPointer<Slider> slider;
+    ScopedPointer<Slider> slider2;
+    ScopedPointer<Slider> slider3;
+    ScopedPointer<Slider> slider4;
 
 
     //==============================================================================

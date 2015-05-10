@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Oscillator.cpp
-    Created: 7 May 2015 8:59:13pm
-    Author:  mobilestudio
+  Oscillator.cpp
+  Created: 7 May 2015 8:59:13pm
+  Author:  mobilestudio
 
   ==============================================================================
 */
@@ -12,157 +12,67 @@
 
 //==============================================================================
 //
-//   Oscillator Class
+//   YAO Class
 //
 //==============================================================================
 
-Oscillator::Oscillator (double sampleRate, int blockSize)
+YAO::YAO ()
 {
-  _sampleRate = sampleRate;
-  _blockSize = blockSize;
-  _phase = 0;
-
-  _outputBuffer = NULL;
-  _outputBuffer = new AudioSampleBuffer (1, _blockSize);
 }
 
-Oscillator::~Oscillator ()
+YAO::YAO (double sampleRate, int blockSize)
 {
-  delete _outputBuffer;
+  pvt_sampleRate = sampleRate;
+  pvt_blockSize = blockSize;
+
+  initOutputBuffer ();
+  zeroOutputBuffer ();
+}
+  
+YAO::~YAO ()
+{
 }
 
-void Oscillator::setFreq (float freq)
+void YAO::updateFrequency (float _freq)
 {
-  _freq = freq;
+  pvt_Frequency = _freq;
 }
 
-String Oscillator::getFreq (void)
-{
-  char temp[10];
-  sprintf (temp,"%f",_freq);
-  String text = temp;
-  return text;
-}
-
-float Oscillator::getFreqRaw (void)
-{
-  return _freq;
-}
-
-void Oscillator::setPhase (float phase)
-{
-  _phase = phase;
-}
-
-float Oscillator::getPhase (void)
-{
-  return _phase;
-}
-
-void Oscillator::setGain (float gain)
-{
-  _gain = gain;
-}
-
-String Oscillator::getGain (void)
-{
-  char temp[10];
-  sprintf (temp,"%f",_gain);
-  String text = temp;
-  return text;
-}
-
-void Oscillator::setShape (int shape)
-{
-  _waveshape = shape;
-}
-
-String Oscillator::getShape (void)
-{
-  if (_waveshape == 0) return "PHASE";
-  else if (_waveshape == 1) return "SINUSOID";
-  else if (_waveshape == 2) return "TRIANGLE";
-  else if (_waveshape == 3) return "SAWTOOTH";
-  else if (_waveshape == 4) return "PWM-SQUARE";
-}
-
-void Oscillator::setPW (float width)
-{
-  _pwmThreshold = width;
-}
-
-String Oscillator::getPW (void)
-{
-  char temp[10];
-  sprintf (temp,"%f",_pwmThreshold);
-  String text = temp;
-  return text;
-}
-
-float Oscillator::calcIncrement (float freq)
-{
-  float temp = (float)_sampleRate / freq;
-  return 1 / temp;
-}
-
-void Oscillator::phasor (float freq)
-{
-  _increment = calcIncrement (freq);
-  if (_phase >= 1) _phase = 0;
-  _phase = _phase + _increment;
-}
-
-//================================================================================
-// WAVESHAPES:      0=PHASESIGNAL  2=           4=PWM
-//                  1=SINUSOID     3=SAWTOOTH
-//
-float Oscillator::waveshaper (float signal)
-{
-  //=PHASE=PHASE=PHASE=PHASE=PHASE=PHASE=PHASE
-  if (_waveshape == 0) return signal * _gain;
-
-  //=SINE=SINE=SINE=SINE=SINE=SINE=SINE=SINE=SINE
-  else if (_waveshape == 1)
+AudioSampleBuffer* YAO::processBlock (void)
+{  
+  for (int i = 0; i < pvt_blockSize; i++)
     {
-      return (sin (signal * 43)) *_gain;
+      pvt_Phase = pvt_Phase + pvt_Increment;
+      outputBuffer->setSample (0, i, pvt_Phase);
     }
   
-  //=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X    <=  TRIANGEL
-  else if (_waveshape == 2)
-    {
-      return signal * _gain;
-    }
-  
-  //=SAW=SAW=SAW=SAW=SAW=SAW=SAW=SAW=SAW=SAW=SAW
-  else if (_waveshape == 3)
-    {
-      return ((signal - 0.5) * 2) *_gain;
-    }
-
-  //=PWM=PWM=PWM=PWM=PWM=PWM=PWM=PWM=PWM=PWM=PWM
-  else if (_waveshape == 4)
-    {
-      if (signal < _pwmThreshold) signal = -1;
-      else signal = 1;
-      
-      return signal * _gain;
-    }
-
-  //=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X=X    <=  Wavetable
-  else if (_waveshape == 5)
-    {
-      return signal * _gain;
-    }
-  
-  return signal * _gain;
+  return outputBuffer;
 }
 
-AudioSampleBuffer* Oscillator::processBlock (void)
+AudioSampleBuffer* YAO::processBlock (AudioSampleBuffer& inputBuffer)
 {
-  for (int i = 0; i < _blockSize; i++)
-      {
-	phasor (_freq);
-	_outputBuffer->setSample (0, i, waveshaper (_phase));
-      }  
-  return _outputBuffer;
+  for (int i = 0; i < pvt_blockSize; i++)
+    {
+      pvt_Phase = pvt_Phase + pvt_Increment;
+      outputBuffer->setSample (0, i, pvt_Phase);
+    }
+  
+  return outputBuffer;
+}
+
+void YAO::updateIncrement (void)
+{
+  float temp_f_IncrementCount = pvt_Frequency / pvt_sampleRate;
+
+  pvt_Increment = 1 / temp_f_IncrementCount;
+}
+
+void YAO::initOutputBuffer (void)
+{
+  outputBuffer = new AudioSampleBuffer (1, pvt_blockSize);
+}
+
+void YAO::zeroOutputBuffer (void)
+{
+  for (int i = 0; i < pvt_blockSize; i++) outputBuffer->setSample (0, i, 0);
 }

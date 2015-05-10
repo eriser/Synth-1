@@ -1,0 +1,31 @@
+
+dRowAudio_SegmentedMeter.cpp
+
+!!  !!
+dRowAudio filebrowser antesten
+dRowAudio_AudioFileDropTarget.cpp ebenso
+dRowAudio_CpuMeter.cpp
+dRowAudio_GraphicalComponent.cpp
+dRowAudio_GuiHelpers.h
+
+
+
+allmächtige class Oscillator implementieren für     fm, pm,
+
+TimeStamped buffer mit midi daten
+
+TimeStamped buffer mit audioModulations daten
+
+
+
+
+
+
+
+
+
+
+
+wishlist
+	***Threading***
+	Threaded GUI implementieren

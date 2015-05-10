@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Filter.h
-    Created: 7 May 2015 8:57:23pm
-    Author:  mobilestudio
+  Filter.h
+  Created: 7 May 2015 8:57:23pm
+  Author:  mobilestudio
 
   ==============================================================================
 */
@@ -21,7 +21,7 @@
 
 class Filter
 {
-public:
+ public:
   
   Filter (double sampleRate, int blockSize);
   ~Filter ();
@@ -37,7 +37,7 @@ public:
 
   AudioSampleBuffer* processBlock (AudioSampleBuffer& inputBuffer);
   
-private:
+ private:
   
   double _sampleRate;
   int _blockSize;

@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    Oscillator.h
-    Created: 7 May 2015 8:59:13pm
-    Author:  mobilestudio
+  Oscillator.h
+  Created: 7 May 2015 8:59:13pm
+  Author:  mobilestudio
 
   ==============================================================================
 */
@@ -12,60 +12,39 @@
 #define OSCILLATOR_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
-
-#define PI 3.14159265
+#endif
 
 //==============================================================================
 //
-//   Oscillator Class
+//   YAO Class
 //
 //==============================================================================
 
-class Oscillator
+class YAO
 {
  public:
+  YAO ();
+  YAO (double sampleRate, int blockSize);
   
-  Oscillator (double sampleRate, int blockSize);
-  ~Oscillator ();
+  ~YAO ();
   
-  void setFreq (float freq);
-  String getFreq (void);
-  float getFreqRaw (void);
-
-  void setPhase (float phase);
-  float getPhase (void);
-  
-  void setGain (float gain);
-  String getGain (void);
-
-  void setShape (int shape);
-  String getShape (void);
-
-  void setPW (float width);
-  String getPW (void);
-
-  float calcIncrement (float freq);
-
-  void phasor (float freq);
-
-  float waveshaper (float signal);
-
   AudioSampleBuffer* processBlock (void);
+  AudioSampleBuffer* processBlock (AudioSampleBuffer& inputBuffer); 
+
+  void updateFrequency (void);
+  void updateFrequency (float _freq);
+  void updateIncrement (void);
   
  private:
-  
-  double _sampleRate;
-  int _blockSize;
-  float _phase;
-  float _freq;
-  float _increment;
-  float _gain;
-  int _waveshape = 1;
-  float _pwmThreshold = 0.5;
-  
-  // Buffer Pointer
-  AudioSampleBuffer *_outputBuffer;
-  
-};
+  double pvt_sampleRate;
+  int pvt_blockSize;
 
-#endif  // OSCILLATOR_H_INCLUDED
+  float pvt_Frequency = 110;
+  
+  float pvt_Increment = 0;
+  float pvt_Phase = 0;
+    
+  AudioSampleBuffer *outputBuffer;
+  void initOutputBuffer (void);
+  void zeroOutputBuffer (void);
+};
